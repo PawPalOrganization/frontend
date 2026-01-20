@@ -1,0 +1,60 @@
+// Left side background
+.leftSide {
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+}
+
+// Logo styling
+.logo {
+  h2 {
+    color: #0d9aff;
+    line-height: 1.2;
+  }
+}
+
+.pawIcon {
+  display: inline-block;
+  transform: rotate(-20deg);
+}
+
+// Dog image placeholder
+.dogImagePlaceholder {
+  max-width: 500px;
+  width: 100%;
+
+  img {
+    max-height: 600px;
+    object-fit: contain;
+  }
+}
+
+// Form card
+.formCard {
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+// User icon circle
+.userIcon {
+  width: 70px;
+  height: 70px;
+  border: 2px solid #e8e8e8;
+}
+
+// Password toggle button
+.passwordToggle {
+  text-decoration: none !important;
+  padding: 0.375rem 0.75rem;
+
+  &:focus {
+    box-shadow: none;
+  }
+}
+
+// Responsive
+@media (max-width: 991.98px) {
+  .formCard {
+    max-width: 100%;
+    margin: 1rem;
+  }
+}

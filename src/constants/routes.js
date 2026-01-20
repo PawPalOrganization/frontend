@@ -1,0 +1,18 @@
+export const ROUTES = {
+  ONBOARDING: '/',
+  LOGIN: '/login',
+  CREATE_ACCOUNT: '/create-account',
+  VALIDATION_CODE: '/validation-code',
+  DASHBOARD: '/dashboard',
+  ADD_PET_PROFILE: '/add-pet-profile',
+  ADD_PET_BREED: '/add-pet-profile/breed',
+  ADD_PET_NAME: '/add-pet-profile/name',
+  ADD_PET_SIZE: '/add-pet-profile/size',
+  ADD_PET_WEIGHT: '/add-pet-profile/weight',
+  ADD_PET_DATES: '/add-pet-profile/dates',
+  ADD_PET_CARETAKERS: '/add-pet-profile/caretakers',
+  SHARE_PROFILE: '/share-profile',
+  HEALTH_CARD: '/health-card',
+  NUTRITION: '/nutrition',
+  ACTIVITIES: '/activities',
+};
