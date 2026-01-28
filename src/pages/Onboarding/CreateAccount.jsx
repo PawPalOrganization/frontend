@@ -117,29 +117,28 @@ const CreateAccount = () => {
   };
 
   return (
-    <div className="container-fluid vh-100 p-0">
+    <div className={`container-fluid p-0 ${styles.pageBackground}`}>
       <div className="row g-0 h-100">
         {/* Left Side - Image */}
-        <div className={`col-lg-6 d-none d-lg-flex ${styles.leftSide}`}>
+        <div className="col-lg-6 d-none d-lg-flex">
           <div className="p-5 d-flex flex-column h-100">
             {/* Logo */}
             <div className={styles.logo}>
-              <h2 className="fw-bold text-primary">
-                <span className={styles.pawIcon}>🐾</span> PAW<br />BUDDY
-              </h2>
+              <img
+                src="/src/assets/images/login/Logo Paw Buddy.png"
+                alt="Paw Buddy Logo"
+                style={{ maxWidth: '150px' }}
+                className="img-fluid"
+              />
             </div>
 
-            {/* Dog Image - Placeholder */}
+            {/* Dog Image */}
             <div className="flex-grow-1 d-flex align-items-center justify-content-center">
               <div className={styles.dogImagePlaceholder}>
                 <img
-                  src="/images/dog-with-toy.png"
+                  src="/src/assets/images/login/dog.png"
                   alt="Happy dog with toy"
                   className="img-fluid"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.parentElement.innerHTML = '<div class="text-muted fs-1">🐕</div>';
-                  }}
                 />
               </div>
             </div>
@@ -147,17 +146,22 @@ const CreateAccount = () => {
         </div>
 
         {/* Right Side - Form */}
-        <div className="col-lg-6 d-flex align-items-center justify-content-center bg-light">
-          <div className={`${styles.formCard} bg-white rounded-4 shadow-sm p-4 my-4`}>
-            {/* User Icon */}
-            <div className="text-center mb-3">
-              <div className={`${styles.userIcon} rounded-circle bg-light d-inline-flex align-items-center justify-content-center`}>
-                <i className="bi bi-person fs-3 text-primary"></i>
+        <div className="col-lg-6 d-flex align-items-center justify-content-center">
+          <div className="w-100 px-3 px-lg-5 form-slide-in">
+            {/* Form Card with Icon */}
+            <div className="position-relative my-5 mx-auto" style={{ maxWidth: '600px' }}>
+              {/* User Icon - Positioned at top center */}
+              <div className="d-flex justify-content-center" style={{ marginBottom: '-45px', zIndex: 10, position: 'relative' }}>
+                <div className="rounded-circle bg-white d-flex align-items-center justify-content-center"
+                     style={{ width: '90px', height: '90px', border: '2px solid #0D9AFF' }}>
+                  <i className="bi bi-person fs-1 text-primary"></i>
+                </div>
               </div>
-            </div>
 
-            {/* Form Header */}
-            <div className="text-center mb-4">
+              {/* Form Card */}
+              <div className={`bg-white rounded-4 p-5 ${styles.formCard}`} style={{ paddingTop: '3.5rem !important' }}>
+              {/* Form Header */}
+              <div className="text-center mb-3">
               <h2 className="fw-bold mb-2">Create account</h2>
               <p className="text-muted mb-0 small">
                 Welcome! Please enter your information below and get started.
@@ -174,16 +178,17 @@ const CreateAccount = () => {
             {/* Form */}
             <form onSubmit={handleSubmit}>
               {/* Name Row */}
-              <div className="row g-2 mb-3">
+              <div className="row g-2 mb-2">
                 <div className="col-6">
                   <label htmlFor="firstName" className="form-label text-muted small mb-1">
                     First Name
                   </label>
                   <input
                     type="text"
-                    className={`form-control form-control-sm ${errors.firstName ? 'is-invalid' : ''}`}
+                    className={`form-control rounded-3 ${errors.firstName ? 'is-invalid' : ''}`}
                     id="firstName"
                     name="firstName"
+                    placeholder="John"
                     value={formData.firstName}
                     onChange={handleChange}
                     disabled={loading}
@@ -198,9 +203,10 @@ const CreateAccount = () => {
                   </label>
                   <input
                     type="text"
-                    className={`form-control form-control-sm ${errors.lastName ? 'is-invalid' : ''}`}
+                    className={`form-control rounded-3 ${errors.lastName ? 'is-invalid' : ''}`}
                     id="lastName"
                     name="lastName"
+                    placeholder="Doe"
                     value={formData.lastName}
                     onChange={handleChange}
                     disabled={loading}
@@ -212,15 +218,16 @@ const CreateAccount = () => {
               </div>
 
               {/* Email */}
-              <div className="mb-3">
+              <div className="mb-2">
                 <label htmlFor="email" className="form-label text-muted small mb-1">
                   Email
                 </label>
                 <input
                   type="email"
-                  className={`form-control form-control-sm ${errors.email ? 'is-invalid' : ''}`}
+                  className={`form-control rounded-3 ${errors.email ? 'is-invalid' : ''}`}
                   id="email"
                   name="email"
+                  placeholder="john.doe@example.com"
                   value={formData.email}
                   onChange={handleChange}
                   disabled={loading}
@@ -231,13 +238,13 @@ const CreateAccount = () => {
               </div>
 
               {/* Phone Number */}
-              <div className="mb-3">
+              <div className="mb-2">
                 <label htmlFor="phoneNumber" className="form-label text-muted small mb-1">
                   Phone Number
                 </label>
                 <input
                   type="tel"
-                  className={`form-control form-control-sm ${errors.phoneNumber ? 'is-invalid' : ''}`}
+                  className={`form-control rounded-3 ${errors.phoneNumber ? 'is-invalid' : ''}`}
                   id="phoneNumber"
                   name="phoneNumber"
                   value={formData.phoneNumber}
@@ -251,16 +258,18 @@ const CreateAccount = () => {
               </div>
 
               {/* Birth Date and Gender Row */}
-              <div className="row g-2 mb-3">
+              <div className="row g-2 mb-2">
                 <div className="col-6">
                   <label htmlFor="birthDate" className="form-label text-muted small mb-1">
                     Birth Date
                   </label>
                   <input
                     type="date"
-                    className={`form-control form-control-sm ${errors.birthDate ? 'is-invalid' : ''}`}
+                    className={`form-control rounded-3 ${errors.birthDate ? 'is-invalid' : ''}`}
                     id="birthDate"
                     name="birthDate"
+                    placeholder="mm/dd/yyyy"
+                    max={new Date().toISOString().split('T')[0]}
                     value={formData.birthDate}
                     onChange={handleChange}
                     disabled={loading}
@@ -274,7 +283,7 @@ const CreateAccount = () => {
                     Gender
                   </label>
                   <select
-                    className={`form-select form-select-sm ${errors.gender ? 'is-invalid' : ''}`}
+                    className={`form-select rounded-3 ${errors.gender ? 'is-invalid' : ''}`}
                     id="gender"
                     name="gender"
                     value={formData.gender}
@@ -293,16 +302,17 @@ const CreateAccount = () => {
               </div>
 
               {/* Password */}
-              <div className="mb-3">
+              <div className="mb-2">
                 <label htmlFor="password" className="form-label text-muted small mb-1">
                   Password
                 </label>
                 <div className="position-relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    className={`form-control form-control-sm ${errors.password ? 'is-invalid' : ''}`}
+                    className={`form-control rounded-3 ${errors.password ? 'is-invalid' : ''}`}
                     id="password"
                     name="password"
+                    placeholder="Enter password"
                     value={formData.password}
                     onChange={handleChange}
                     disabled={loading}
@@ -322,15 +332,16 @@ const CreateAccount = () => {
               </div>
 
               {/* Confirm Password */}
-              <div className="mb-3">
+              <div className="mb-2">
                 <label htmlFor="confirmPassword" className="form-label text-muted small mb-1">
                   Confirm Password
                 </label>
                 <input
                   type="password"
-                  className={`form-control form-control-sm ${errors.confirmPassword ? 'is-invalid' : ''}`}
+                  className={`form-control rounded-3 ${errors.confirmPassword ? 'is-invalid' : ''}`}
                   id="confirmPassword"
                   name="confirmPassword"
+                  placeholder="Re-enter password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   disabled={loading}
@@ -341,7 +352,7 @@ const CreateAccount = () => {
               </div>
 
               {/* Terms and Conditions */}
-              <div className="mb-4">
+              <div className="mb-3">
                 <div className="form-check">
                   <input
                     type="checkbox"
@@ -364,7 +375,7 @@ const CreateAccount = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="btn btn-primary w-100 py-2 fw-semibold rounded-3"
+                className="btn btn-primary w-100 py-2 fw-semibold rounded-3 mb-2"
                 disabled={loading}
               >
                 {loading ? (
@@ -379,13 +390,15 @@ const CreateAccount = () => {
             </form>
 
             {/* Footer */}
-            <div className="text-center mt-3">
+            <div className="text-center mt-2">
               <p className="text-muted mb-0 small">
                 Already have an account?{' '}
                 <Link to={ROUTES.LOGIN} className="text-primary text-decoration-none fw-semibold">
                   Log in here
                 </Link>
               </p>
+            </div>
+              </div>
             </div>
           </div>
         </div>

@@ -122,6 +122,288 @@ src/
     └── config.js
 ```
 
+---
+
+## Admin Dashboard Structure (✅ FOUNDATION COMPLETE)
+
+### Overview
+Admin web dashboard for managing users, pets, and system configuration. Built separately from mobile app with different authentication.
+
+**Status:** Core foundation complete with working authentication, layout, and live dashboard statistics. Ready for building CRUD management pages.
+
+**Last Updated:** January 28, 2026
+
+### ✨ Session Summary (Jan 28, 2026)
+
+**What We Built:**
+- ✅ Complete admin authentication system (login/logout with JWT)
+- ✅ Admin API service layer (all CRUD endpoints wrapped)
+- ✅ Reusable UI components (Button, Input, Modal)
+- ✅ Admin sidebar with navigation and profile
+- ✅ Dashboard with live statistics from backend
+- ✅ Fixed CORS, proxy configuration, and SPA routing
+- ✅ Proper logout with redirect functionality
+
+**Ready to Use:**
+- Login at `/login` with superadmin credentials
+- View live stats on dashboard (users, pets, admins, pet types)
+- Navigate through sidebar (layout ready for new pages)
+- All services ready to build CRUD pages
+
+### Completed Components
+
+```
+src/
+├── services/                    # ✅ COMPLETE - Admin API Layer
+│   ├── adminApi.js             # Admin Axios instance (/admin/api)
+│   ├── adminAuthService.js     # Admin login/logout
+│   ├── adminUsersService.js    # Users CRUD operations
+│   ├── adminPetsService.js     # Pets CRUD operations
+│   ├── adminPetTypesService.js # Pet Types CRUD
+│   └── adminAdminsService.js   # Admins management
+│
+├── context/                     # ✅ COMPLETE - Admin Auth
+│   └── AdminAuthContext.jsx    # Admin authentication state
+│
+├── components/
+│   ├── common/                  # ✅ COMPLETE - Reusable Components
+│   │   ├── Button/
+│   │   │   ├── Button.jsx      # Multi-variant button (primary, danger, outline)
+│   │   │   └── Button.module.css
+│   │   ├── Input/
+│   │   │   ├── Input.jsx       # Form input with label, error, icon
+│   │   │   └── Input.module.css
+│   │   └── Modal/
+│   │       ├── Modal.jsx       # Dialog modal (small, medium, large)
+│   │       └── Modal.css
+│   │
+│   └── layout/                  # ✅ COMPLETE - Admin Layout
+│       ├── AdminSidebar/
+│       │   ├── AdminSidebar.jsx        # Dark sidebar with navigation
+│       │   └── AdminSidebar.module.scss
+│       └── AdminLayout/
+│           ├── AdminLayout.jsx         # Layout wrapper with sidebar
+│           └── AdminLayout.module.scss
+│
+└── pages/
+    ├── Login/                   # ✅ COMPLETE - Admin Login
+    │   ├── Login.jsx           # Converted to admin authentication
+    │   └── Login.module.scss
+    │
+    └── Admin/                   # ✅ COMPLETE - Dashboard Page
+        ├── Dashboard.jsx       # Dashboard with live stats from API
+        └── Dashboard.module.scss
+```
+
+### Admin Routes Structure
+
+```javascript
+/login                          // ✅ Admin login page
+/admin
+  ├── /dashboard               // ✅ Dashboard with live stats (COMPLETE)
+  ├── /users                   // ⏳ TODO: Users management
+  ├── /pets                    // ⏳ TODO: Pets management
+  ├── /pet-types               // ⏳ TODO: Pet Types management
+  ├── /admins                  // ⏳ TODO: Admins management
+  ├── /account                 // ⏳ TODO: Account settings
+  └── /settings                // ⏳ TODO: System settings
+```
+
+### Current Working Features
+
+**✅ Fully Functional:**
+- **Admin Login** - Login with email/password, JWT token storage
+- **Admin Logout** - Clears session and redirects to login
+- **Dashboard Stats** - Displays real-time counts:
+  - Total Users (fetched from `/admin/api/users`)
+  - Total Pets (fetched from `/admin/api/pets`)
+  - Admins (fetched from `/admin/api/admins`)
+  - Pet Types (fetched from `/admin/api/pet-types`)
+- **Sidebar Navigation** - Active route highlighting, profile display
+- **Authentication Flow** - Auto-login from localStorage, token refresh on reload
+
+**🔧 Important Technical Fixes:**
+1. **CORS Fixed** - Vite proxy configured for `/admin/api` endpoints
+2. **SPA Routing Fixed** - Changed proxy from `/admin` to `/admin/api` to allow client-side routing
+3. **API Response Structure** - Backend returns `{ data, meta }` not `{ data: { pagination } }`
+4. **Logout Navigation** - Added redirect to login after logout
+
+**📋 API Response Format:**
+```javascript
+// Backend response structure:
+{
+  success: true,
+  message: "...",
+  data: [...],      // Array of items
+  meta: {           // Pagination info
+    total: 12,
+    page: 1,
+    limit: 10,
+    totalPages: 2
+  }
+}
+```
+
+### Admin API Endpoints (Backend)
+
+**Authentication:**
+- `POST /admin/api/auth/login` - Admin login
+
+**Users Management:**
+- `GET /admin/api/users` - List users (pagination, search)
+- `GET /admin/api/users/:id` - Get user details
+- `POST /admin/api/users` - Create user
+- `PUT /admin/api/users/:id` - Update user
+- `DELETE /admin/api/users/:id` - Delete user
+- `GET /admin/api/users/dropdown` - Users dropdown (id, name, email only)
+
+**Pets Management:**
+- `GET /admin/api/pets` - List pets (pagination, search, filters)
+- `GET /admin/api/pets/:id` - Get pet details
+- `POST /admin/api/pets` - Create pet
+- `PUT /admin/api/pets/:id` - Update pet
+- `DELETE /admin/api/pets/:id` - Delete pet
+- `GET /admin/api/pets/user/:userId` - Get user's pets
+
+**Pet Types Management:**
+- `GET /admin/api/pet-types` - List pet types
+- `GET /admin/api/pet-types/:id` - Get pet type
+- `POST /admin/api/pet-types` - Create pet type
+- `PUT /admin/api/pet-types/:id` - Update pet type
+- `DELETE /admin/api/pet-types/:id` - Delete pet type
+
+**Admins Management:**
+- `GET /admin/api/admins` - List admins
+- `GET /admin/api/admins/:id` - Get admin details
+- `POST /admin/api/admins` - Create admin
+- `PUT /admin/api/admins/:id` - Update admin
+- `DELETE /admin/api/admins/:id` - Delete admin
+
+### Admin Authentication Flow
+
+1. Admin logs in at `/login`
+2. Credentials sent to `POST /admin/api/auth/login`
+3. Receives JWT token + admin data
+4. Token stored in localStorage as `adminToken`
+5. All subsequent admin API calls include `Authorization: Bearer {token}`
+6. On 401 error, redirect to login and clear token
+
+### Reusable Components
+
+**Button Component:**
+```jsx
+<Button variant="primary|secondary|danger|outline"
+        size="small|medium|large"
+        loading={boolean}
+        icon="bi-plus"
+        fullWidth={boolean}>
+  Label
+</Button>
+```
+
+**Input Component:**
+```jsx
+<Input label="Email"
+       type="email"
+       placeholder="Enter email"
+       value={value}
+       onChange={handler}
+       error="Error message"
+       icon="bi-envelope"
+       required={boolean} />
+```
+
+**Modal Component:**
+```jsx
+<Modal isOpen={boolean}
+       onClose={handler}
+       title="Modal Title"
+       size="small|medium|large"
+       footer={<Buttons />}>
+  {children}
+</Modal>
+```
+
+### Next Steps (TODO)
+
+#### Phase 1: Management Pages
+- [ ] Users Management Page (list, create, edit, delete)
+- [ ] Pets Management Page (list, create, edit, delete)
+- [ ] Pet Types Management Page (list, create, edit, delete)
+- [ ] Admins Management Page (list, create, edit, delete)
+
+#### Phase 2: Additional Components
+- [ ] DataTable component (pagination, sorting, search)
+- [ ] SearchBar component
+- [ ] DeleteConfirmation modal
+- [ ] StatCard component for dashboard
+
+#### Phase 3: Features
+- [ ] Protected routes (redirect if not authenticated)
+- [ ] Form validation
+- [ ] Toast notifications
+- [ ] Loading states
+- [ ] Error handling UI
+- [x] Dashboard statistics with real data ✅
+
+#### Phase 4: Polish
+- [ ] Responsive design (mobile sidebar)
+- [ ] Dark mode toggle
+- [ ] User profile management
+- [ ] Settings page
+- [ ] Activity logs
+
+### Test Credentials
+
+**Superadmin (Pre-seeded):**
+```
+Email: superadmin@admin.com
+Password: admin123
+```
+
+**Creating New Admins:**
+Use Postman to create additional admin accounts:
+```
+POST {{baseUrl}}/admin/api/admins
+Headers: Authorization: Bearer {{adminToken}}
+Body: {
+  "name": "Admin Name",
+  "email": "admin@example.com",
+  "password": "password123"
+}
+```
+
+### Development Setup
+
+**1. Install Dependencies:**
+```bash
+npm install
+```
+
+**2. Configure Environment (Optional):**
+Create `.env` file:
+```
+VITE_API_BASE_URL=https://backend-production-12d0.up.railway.app
+```
+
+**3. Start Dev Server:**
+```bash
+npm run dev
+```
+
+**4. Access Application:**
+- Frontend: `http://localhost:5173`
+- Login: `http://localhost:5173/login`
+- Dashboard: `http://localhost:5173/admin/dashboard`
+
+**Important Notes:**
+- Vite proxy handles CORS in development (`/admin/api` → backend)
+- Refresh works correctly (proxy only catches `/admin/api`, not `/admin/*`)
+- Admin token stored in localStorage as `adminToken`
+- Services return `response.data` (already unwrapped from Axios)
+
+---
+
 ## Design System
 
 ### Colors

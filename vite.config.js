@@ -12,6 +12,12 @@ export default defineConfig({
         secure: false,
         rewrite: (path) => path,
       },
+      '/admin/api': {
+        target: 'https://backend-production-12d0.up.railway.app',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path,
+      },
     },
   },
 })

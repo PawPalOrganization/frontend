@@ -1,0 +1,17 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+}
+
+.mainContent {
+  flex: 1;
+  margin-left: 250px; // Sidebar width
+  min-height: 100vh;
+}
+
+.contentWrapper {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}

@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
-import { ROUTES } from '../../constants/routes';
+import { useNavigate } from 'react-router-dom';
+import { useAdminAuth } from '../../context/AdminAuthContext';
 import styles from './Login.module.scss';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login } = useAdminAuth();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -62,7 +61,7 @@ const Login = () => {
         email: formData.email,
         password: formData.password,
       });
-      navigate(ROUTES.DASHBOARD);
+      navigate('/admin/dashboard');
     } catch (error) {
       setErrors({
         form: error.message || 'Login failed. Please check your credentials.',
@@ -73,30 +72,28 @@ const Login = () => {
   };
 
   return (
-    <div className="container-fluid vh-100 p-0">
+    <div className={`container-fluid p-0 ${styles.pageBackground}`}>
       <div className="row g-0 h-100">
         {/* Left Side - Image */}
-        <div className={`col-lg-6 d-none d-lg-flex ${styles.leftSide}`}>
-          <div className="p-5 d-flex flex-column h-100">
+        <div className="col-lg-6 d-none d-lg-flex">
+        <div className="p-5 d-flex flex-column h-100">
             {/* Logo */}
             <div className={styles.logo}>
-              <h2 className="fw-bold text-primary">
-                <span className={styles.pawIcon}>🐾</span> PAW<br />BUDDY
-              </h2>
+              <img
+                src="/src/assets/images/login/Logo Paw Buddy.png"
+                alt="Paw Buddy Logo"
+                style={{ maxWidth: '150px' }}
+                className="img-fluid"
+              />
             </div>
 
-            {/* Dog Image - Placeholder */}
+            {/* Dog Image */}
             <div className="flex-grow-1 d-flex align-items-center justify-content-center">
               <div className={styles.dogImagePlaceholder}>
-                {/* Add your dog image here */}
                 <img
-                  src="/images/dog-with-toy.png"
-                  alt="Happy dog"
+                  src="/src/assets/images/login/dog.png"
+                  alt="Happy dog with toy"
                   className="img-fluid"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.parentElement.innerHTML = '<div class="text-muted fs-1">🐕</div>';
-                  }}
                 />
               </div>
             </div>
@@ -104,20 +101,25 @@ const Login = () => {
         </div>
 
         {/* Right Side - Form */}
-        <div className="col-lg-6 d-flex align-items-center justify-content-center bg-light">
-          <div className={`${styles.formCard} bg-white rounded-4 shadow-sm p-5`}>
-            {/* User Icon */}
-            <div className="text-center mb-4">
-              <div className={`${styles.userIcon} rounded-circle bg-light d-inline-flex align-items-center justify-content-center`}>
-                <i className="bi bi-person fs-3 text-primary"></i>
+        <div className="col-lg-6 d-flex align-items-center justify-content-center">
+          <div className="w-100 px-3 px-lg-5 form-slide-in">
+            {/* Form Card with Icon */}
+            <div className="position-relative my-5 mx-auto" style={{ maxWidth: '600px' }}>
+              {/* User Icon - Positioned at top center */}
+              <div className="d-flex justify-content-center" style={{ marginBottom: '-45px', zIndex: 10, position: 'relative' }}>
+                <div className="rounded-circle bg-white d-flex align-items-center justify-content-center"
+                     style={{ width: '90px', height: '90px', border: '2px solid #0D9AFF' }}>
+                  <i className="bi bi-person fs-1 text-primary"></i>
+                </div>
               </div>
-            </div>
 
-            {/* Form Header */}
-            <div className="text-center mb-4">
-              <h2 className="fw-bold mb-2">Welcome back</h2>
+              {/* Form Card */}
+              <div className={`bg-white rounded-4 p-5 ${styles.formCard}`} style={{ paddingTop: '3.5rem !important' }}>
+              {/* Form Header */}
+              <div className="text-center mb-2">
+              <h2 className="fw-bold mb-2">Admin Login</h2>
               <p className="text-muted mb-0">
-                Please enter your credentials to log in.
+                Sign in to access the admin dashboard.
               </p>
             </div>
 
@@ -131,13 +133,13 @@ const Login = () => {
             {/* Form */}
             <form onSubmit={handleSubmit}>
               {/* Email */}
-              <div className="mb-3">
-                <label htmlFor="email" className="form-label text-muted small">
+              <div className="mb-2">
+                <label htmlFor="email" className="form-label text-muted small mb-1">
                   Email
                 </label>
                 <input
                   type="email"
-                  className={`form-control py-2 ${errors.email ? 'is-invalid' : ''}`}
+                  className={`form-control rounded-3 ${errors.email ? 'is-invalid' : ''}`}
                   id="email"
                   name="email"
                   value={formData.email}
@@ -146,19 +148,19 @@ const Login = () => {
                   disabled={loading}
                 />
                 {errors.email && (
-                  <div className="invalid-feedback">{errors.email}</div>
+                  <div className="invalid-feedback small">{errors.email}</div>
                 )}
               </div>
 
               {/* Password */}
-              <div className="mb-4">
-                <label htmlFor="password" className="form-label text-muted small">
+              <div className="mb-2">
+                <label htmlFor="password" className="form-label text-muted small mb-1">
                   Password
                 </label>
                 <div className="position-relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    className={`form-control py-2 ${errors.password ? 'is-invalid' : ''}`}
+                    className={`form-control rounded-3 ${errors.password ? 'is-invalid' : ''}`}
                     id="password"
                     name="password"
                     value={formData.password}
@@ -176,7 +178,7 @@ const Login = () => {
                   </button>
                 </div>
                 {errors.password && (
-                  <div className="invalid-feedback d-block">{errors.password}</div>
+                  <div className="invalid-feedback d-block small">{errors.password}</div>
                 )}
               </div>
 
@@ -196,15 +198,7 @@ const Login = () => {
                 )}
               </button>
             </form>
-
-            {/* Footer */}
-            <div className="text-center mt-4">
-              <p className="text-muted mb-0 small">
-                Don't have an account?{' '}
-                <Link to={ROUTES.CREATE_ACCOUNT} className="text-primary text-decoration-none fw-semibold">
-                  Create account here
-                </Link>
-              </p>
+              </div>
             </div>
           </div>
         </div>

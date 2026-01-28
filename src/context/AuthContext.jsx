@@ -1,9 +1,10 @@
+/* eslint-disable no-useless-catch */
 import { createContext, useState, useEffect } from 'react';
 import authService from '../services/authService';
 
-export const AuthContext = createContext(null);
+const AuthContext = createContext(null);
 
-export const AuthProvider = ({ children }) => {
+const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -72,3 +73,5 @@ export const AuthProvider = ({ children }) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+export {AuthContext, AuthProvider}

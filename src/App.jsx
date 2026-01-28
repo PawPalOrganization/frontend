@@ -1,40 +1,32 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import { ROUTES } from './constants/routes';
-
-// Import pages
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AdminAuthProvider } from './context/AdminAuthContext';
+import AdminLayout from './components/layout/AdminLayout/AdminLayout';
 import Login from './pages/Login/Login';
-import CreateAccount from './pages/Onboarding/CreateAccount';
+import Dashboard from './pages/Admin/Dashboard';
 
 function App() {
   return (
-    <AuthProvider>
+    <AdminAuthProvider>
       <Router>
         <Routes>
-          {/* Onboarding Routes */}
-          <Route path={ROUTES.ONBOARDING} element={<div>Onboarding</div>} />
-          <Route path={ROUTES.LOGIN} element={<Login />} />
-          <Route path={ROUTES.CREATE_ACCOUNT} element={<CreateAccount />} />
-          <Route path={ROUTES.VALIDATION_CODE} element={<div>Validation Code</div>} />
+          {/* Public Routes */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/login" element={<Login />} />
 
-        {/* Main App Routes */}
-        <Route path={ROUTES.DASHBOARD} element={<div>Dashboard</div>} />
-        <Route path={ROUTES.ADD_PET_PROFILE} element={<div>Add Pet Profile</div>} />
-        <Route path={ROUTES.SHARE_PROFILE} element={<div>Share Profile</div>} />
-        <Route path={ROUTES.HEALTH_CARD} element={<div>Health Card</div>} />
-        <Route path={ROUTES.NUTRITION} element={<div>Nutrition</div>} />
-        <Route path={ROUTES.ACTIVITIES} element={<div>Activities</div>} />
-
-        {/* Add Pet Profile Steps */}
-        <Route path={ROUTES.ADD_PET_BREED} element={<div>Breed Selection</div>} />
-        <Route path={ROUTES.ADD_PET_NAME} element={<div>Name Step</div>} />
-        <Route path={ROUTES.ADD_PET_SIZE} element={<div>Size Step</div>} />
-        <Route path={ROUTES.ADD_PET_WEIGHT} element={<div>Weight Step</div>} />
-        <Route path={ROUTES.ADD_PET_DATES} element={<div>Important Dates</div>} />
-        <Route path={ROUTES.ADD_PET_CARETAKERS} element={<div>Caretakers</div>} />
-      </Routes>
-    </Router>
-  </AuthProvider>
+          {/* Admin Dashboard Routes */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Navigate to="/admin/dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="users" element={<div>Users Management</div>} />
+            <Route path="pets" element={<div>Pets Management</div>} />
+            <Route path="pet-types" element={<div>Pet Types Management</div>} />
+            <Route path="admins" element={<div>Admins Management</div>} />
+            <Route path="account" element={<div>Account Settings</div>} />
+            <Route path="settings" element={<div>Settings</div>} />
+          </Route>
+        </Routes>
+      </Router>
+    </AdminAuthProvider>
   );
 }
 
