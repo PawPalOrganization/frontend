@@ -7,7 +7,18 @@
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 100;
+  z-index: 1000;
+  transition: transform 0.3s ease;
+
+  // Mobile: Hide by default, slide in when open
+  @media (max-width: 768px) {
+    transform: translateX(-100%);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+
+    &.open {
+      transform: translateX(0);
+    }
+  }
 }
 
 // Logo section

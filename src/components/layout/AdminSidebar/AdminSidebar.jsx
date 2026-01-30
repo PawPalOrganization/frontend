@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../../../context/AdminAuthContext';
 import styles from './AdminSidebar.module.scss';
 
-const AdminSidebar = () => {
+const AdminSidebar = ({ isOpen = false, onClose = () => {} }) => {
   const { admin, logout } = useAdminAuth();
   const navigate = useNavigate();
 
@@ -24,8 +24,15 @@ const AdminSidebar = () => {
     { path: '/admin/settings', icon: 'bi-gear', label: 'Settings' },
   ];
 
+  const handleNavClick = () => {
+    // Close sidebar on mobile when navigating
+    if (window.innerWidth <= 768) {
+      onClose();
+    }
+  };
+
   return (
-    <div className={styles.sidebar}>
+    <div className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
       {/* Logo */}
       <div className={styles.logo}>
         <img
@@ -45,6 +52,7 @@ const AdminSidebar = () => {
                 className={({ isActive }) =>
                   `${styles.navLink} ${isActive ? styles.active : ''}`
                 }
+                onClick={handleNavClick}
               >
                 <i className={`bi ${item.icon} ${styles.navIcon}`}></i>
                 <span>{item.label}</span>
@@ -66,6 +74,7 @@ const AdminSidebar = () => {
                   className={({ isActive }) =>
                     `${styles.navLink} ${isActive ? styles.active : ''}`
                   }
+                  onClick={handleNavClick}
                 >
                   <i className={`bi ${item.icon} ${styles.navIcon}`}></i>
                   <span>{item.label}</span>

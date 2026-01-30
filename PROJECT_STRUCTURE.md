@@ -129,9 +129,46 @@ src/
 ### Overview
 Admin web dashboard for managing users, pets, and system configuration. Built separately from mobile app with different authentication.
 
-**Status:** Core foundation complete with working authentication, layout, and live dashboard statistics. Ready for building CRUD management pages.
+**Status:** Core foundation complete with working authentication, layout, and live dashboard statistics. Users and Pets management pages fully functional with CRUD operations. Responsive design implemented for mobile/tablet support.
 
-**Last Updated:** January 28, 2026
+**Last Updated:** January 30, 2026
+
+### ✨ Session Summary (Jan 30, 2026 - Part 2: Responsive Design)
+
+**What We Built:**
+- ✅ Collapsible sidebar with hamburger menu for mobile
+- ✅ Responsive DataTable with horizontal scrolling
+- ✅ Mobile-friendly page headers and buttons
+- ✅ Responsive modals (full-width on mobile, stacked buttons)
+- ✅ Touch-friendly form layouts (single column on mobile)
+- ✅ Adaptive content padding and spacing
+- ✅ Smooth animations and transitions
+
+**Responsive Features:**
+- Sidebar collapses on screens ≤768px with overlay
+- Tables scroll horizontally on narrow screens
+- Forms switch to single-column layout on mobile
+- Modal buttons stack vertically for easier tapping
+- All elements properly sized for touch interaction
+
+### ✨ Session Summary (Jan 30, 2026 - Part 1: CRUD Management)
+
+**What We Built:**
+- ✅ DataTable component (reusable table with pagination, search, actions)
+- ✅ Users Management Page (complete CRUD operations)
+- ✅ Pets Management Page (complete CRUD operations with owner/type dropdowns)
+- ✅ Search functionality across both management pages
+- ✅ Form validation and error handling
+- ✅ Delete confirmation modals
+- ✅ Consistent design system maintained
+- ✅ Fixed API data formatting (camelCase, capitalized enums, age calculation)
+
+**Now Available:**
+- Full Users management at `/admin/users` (create, read, update, delete)
+- Full Pets management at `/admin/pets` (create, read, update, delete)
+- Search users by name or email
+- Search pets by name or breed
+- Pagination for large datasets
 
 ### ✨ Session Summary (Jan 28, 2026)
 
@@ -173,9 +210,12 @@ src/
 │   │   ├── Input/
 │   │   │   ├── Input.jsx       # Form input with label, error, icon
 │   │   │   └── Input.module.css
-│   │   └── Modal/
-│   │       ├── Modal.jsx       # Dialog modal (small, medium, large)
-│   │       └── Modal.css
+│   │   ├── Modal/
+│   │   │   ├── Modal.jsx       # Dialog modal (small, medium, large)
+│   │   │   └── Modal.css
+│   │   └── DataTable/           # ✅ NEW - Reusable Data Table
+│   │       ├── DataTable.jsx    # Table with pagination, search, actions
+│   │       └── DataTable.module.scss
 │   │
 │   └── layout/                  # ✅ COMPLETE - Admin Layout
 │       ├── AdminSidebar/
@@ -190,9 +230,13 @@ src/
     │   ├── Login.jsx           # Converted to admin authentication
     │   └── Login.module.scss
     │
-    └── Admin/                   # ✅ COMPLETE - Dashboard Page
+    └── Admin/                   # ✅ COMPLETE - Admin Pages
         ├── Dashboard.jsx       # Dashboard with live stats from API
-        └── Dashboard.module.scss
+        ├── Dashboard.module.scss
+        ├── Users.jsx           # ✅ NEW - Users management (full CRUD)
+        ├── Users.module.scss
+        ├── Pets.jsx            # ✅ NEW - Pets management (full CRUD)
+        └── Pets.module.scss
 ```
 
 ### Admin Routes Structure
@@ -201,8 +245,8 @@ src/
 /login                          // ✅ Admin login page
 /admin
   ├── /dashboard               // ✅ Dashboard with live stats (COMPLETE)
-  ├── /users                   // ⏳ TODO: Users management
-  ├── /pets                    // ⏳ TODO: Pets management
+  ├── /users                   // ✅ Users management (COMPLETE)
+  ├── /pets                    // ✅ Pets management (COMPLETE)
   ├── /pet-types               // ⏳ TODO: Pet Types management
   ├── /admins                  // ⏳ TODO: Admins management
   ├── /account                 // ⏳ TODO: Account settings
@@ -221,6 +265,20 @@ src/
   - Pet Types (fetched from `/admin/api/pet-types`)
 - **Sidebar Navigation** - Active route highlighting, profile display
 - **Authentication Flow** - Auto-login from localStorage, token refresh on reload
+- **Users Management** - Full CRUD operations:
+  - List users with pagination (10 per page)
+  - Search users by name or email
+  - Create new users with validation
+  - Edit existing users
+  - Delete users with confirmation modal
+  - Fields: First Name, Last Name, Email, Phone, Password, Birth Date, Gender
+- **Pets Management** - Full CRUD operations:
+  - List pets with owner information
+  - Search pets by name or breed
+  - Create new pets with owner/type selection
+  - Edit existing pets
+  - Delete pets with confirmation modal
+  - Fields: Pet Name, Owner (dropdown), Pet Type (dropdown), Breed, Birth Date, Gender, Size, Weight
 
 **🔧 Important Technical Fixes:**
 1. **CORS Fixed** - Vite proxy configured for `/admin/api` endpoints
@@ -324,18 +382,37 @@ src/
 </Modal>
 ```
 
+**DataTable Component:**
+```jsx
+<DataTable
+       columns={[
+         { key: 'name', label: 'Name', width: '20%' },
+         { key: 'email', label: 'Email', width: '30%' },
+         { key: 'status', label: 'Status', render: (row) => <Badge>{row.status}</Badge> }
+       ]}
+       data={items}
+       loading={boolean}
+       currentPage={number}
+       totalPages={number}
+       totalItems={number}
+       onPageChange={handler}
+       onEdit={handler}
+       onDelete={handler}
+       emptyMessage="No items found" />
+```
+
 ### Next Steps (TODO)
 
 #### Phase 1: Management Pages
-- [ ] Users Management Page (list, create, edit, delete)
-- [ ] Pets Management Page (list, create, edit, delete)
+- [x] Users Management Page (list, create, edit, delete) ✅
+- [x] Pets Management Page (list, create, edit, delete) ✅
 - [ ] Pet Types Management Page (list, create, edit, delete)
 - [ ] Admins Management Page (list, create, edit, delete)
 
 #### Phase 2: Additional Components
-- [ ] DataTable component (pagination, sorting, search)
-- [ ] SearchBar component
-- [ ] DeleteConfirmation modal
+- [x] DataTable component (pagination, sorting, search) ✅
+- [ ] SearchBar component (integrated in management pages)
+- [ ] DeleteConfirmation modal (integrated in management pages)
 - [ ] StatCard component for dashboard
 
 #### Phase 3: Features
@@ -347,7 +424,10 @@ src/
 - [x] Dashboard statistics with real data ✅
 
 #### Phase 4: Polish
-- [ ] Responsive design (mobile sidebar)
+- [x] Responsive design (mobile sidebar) ✅
+- [x] Responsive tables (horizontal scroll) ✅
+- [x] Responsive modals and forms ✅
+- [ ] Advanced table responsiveness (card view on mobile)
 - [ ] Dark mode toggle
 - [ ] User profile management
 - [ ] Settings page
