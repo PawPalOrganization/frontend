@@ -4,12 +4,16 @@ import AdminSidebar from '../AdminSidebar/AdminSidebar';
 import styles from './AdminLayout.module.scss';
 
 const AdminLayout = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  // Sidebar starts open on XL screens (>1200px), closed on smaller screens
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 1200);
 
-  // Close sidebar when screen becomes larger
+  // Handle window resize
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth > 768) {
+      // Auto-open on XL screens, auto-close on 1200px and below
+      if (window.innerWidth > 1200) {
+        setIsSidebarOpen(true);
+      } else {
         setIsSidebarOpen(false);
       }
     };
@@ -30,7 +34,7 @@ const AdminLayout = () => {
     <div className={styles.layout}>
       {/* Hamburger Button - Visible on mobile */}
       <button
-        className={styles.hamburger}
+        className={`${styles.hamburger} ${isSidebarOpen ? styles.hamburgerOpen : ''}`}
         onClick={toggleSidebar}
         aria-label="Toggle sidebar"
       >
@@ -47,7 +51,7 @@ const AdminLayout = () => {
 
       <AdminSidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
 
-      <main className={styles.mainContent}>
+      <main className={`${styles.mainContent} ${!isSidebarOpen ? styles.sidebarClosed : ''}`}>
         <div className={styles.contentWrapper}>
           <Outlet />
         </div>

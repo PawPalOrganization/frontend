@@ -8,7 +8,8 @@ const AdminSidebar = ({ isOpen = false, onClose = () => {} }) => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    // Use replace to prevent back button from returning to protected pages
+    navigate('/login', { replace: true });
   };
 
   const navItems = [

@@ -20,7 +20,7 @@ export const AdminAuthProvider = ({ children }) => {
           setIsAuthenticated(true);
         }
       } catch (error) {
-        console.error('Auth check failed:', error);
+        // Auth check failed - silently continue
       } finally {
         setLoading(false);
       }
@@ -37,6 +37,9 @@ export const AdminAuthProvider = ({ children }) => {
       setIsAuthenticated(true);
       return data;
     } catch (error) {
+      // Ensure auth state is cleared on failure
+      setAdmin(null);
+      setIsAuthenticated(false);
       throw new Error(error.response?.data?.message || 'Login failed');
     }
   };

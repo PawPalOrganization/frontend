@@ -84,17 +84,6 @@ const DataTable = ({
     );
   };
 
-  if (loading) {
-    return (
-      <div className={styles.loadingContainer}>
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-        <p className={styles.loadingText}>Loading data...</p>
-      </div>
-    );
-  }
-
   if (!data || data.length === 0) {
     return (
       <div className={styles.emptyContainer}>

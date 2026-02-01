@@ -21,7 +21,7 @@ const AuthProvider = ({ children }) => {
           setIsAuthenticated(true);
         }
       } catch (error) {
-        console.error('Error initializing auth:', error);
+        // Error initializing auth - silently continue
       } finally {
         setLoading(false);
       }

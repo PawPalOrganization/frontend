@@ -1,10 +1,10 @@
-.usersPage {
+.adminsPage {
   padding: 0;
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden; // Prevent horizontal scroll on page level
+  overflow-x: hidden;
 
-  @media (max-width: 768px) {
+  @media (max-width: 991px) {
     padding: 0;
   }
 }
@@ -17,7 +17,7 @@
   gap: 16px;
   flex-wrap: wrap;
 
-  @media (max-width: 768px) {
+  @media (max-width: 991px) {
     flex-direction: column;
     align-items: flex-start;
     margin-bottom: 20px;
@@ -30,7 +30,7 @@
   color: #2C3E50;
   margin: 0;
 
-  @media (max-width: 768px) {
+  @media (max-width: 991px) {
     font-size: 22px;
   }
 }
@@ -40,7 +40,7 @@
   color: #7F8C8D;
   margin: 4px 0 0 0;
 
-  @media (max-width: 768px) {
+  @media (max-width: 991px) {
     font-size: 13px;
   }
 }
@@ -48,7 +48,7 @@
 .searchBar {
   margin-bottom: 24px;
 
-  @media (max-width: 768px) {
+  @media (max-width: 991px) {
     margin-bottom: 16px;
   }
 }
@@ -57,7 +57,7 @@
   position: relative;
   max-width: 400px;
 
-  @media (max-width: 768px) {
+  @media (max-width: 991px) {
     max-width: 100%;
   }
 
@@ -90,32 +90,10 @@
   }
 }
 
-.badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: capitalize;
-  background: #E3F2FD;
-  color: #0D9AFF;
-}
-
 .form {
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
-
-.formRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
 }
 
 .label {
@@ -124,22 +102,4 @@
   font-weight: 600;
   color: #495057;
   margin-bottom: 8px;
-}
-
-.select {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid #DEE2E6;
-  border-radius: 8px;
-  font-size: 14px;
-  color: #2C3E50;
-  background: white;
-  transition: all 0.2s ease;
-  cursor: pointer;
-
-  &:focus {
-    outline: none;
-    border-color: #0D9AFF;
-    box-shadow: 0 0 0 3px rgba(13, 154, 255, 0.1);
-  }
 }

@@ -27,37 +27,33 @@ const Dashboard = () => {
         // Fetch users
         try {
           const usersRes = await adminUsersService.getAllUsers(1, 1);
-          console.log('Users response:', usersRes);
           usersCount = usersRes.meta?.total || 0;
         } catch (err) {
-          console.error('Failed to fetch users:', err.response?.data || err.message);
+          // Error fetching users
         }
 
         // Fetch pets
         try {
           const petsRes = await adminPetsService.getAllPets(1, 1);
-          console.log('Pets response:', petsRes);
           petsCount = petsRes.meta?.total || 0;
         } catch (err) {
-          console.error('Failed to fetch pets:', err.response?.data || err.message);
+          // Error fetching pets
         }
 
         // Fetch admins
         try {
           const adminsRes = await adminAdminsService.getAllAdmins(1, 1);
-          console.log('Admins response:', adminsRes);
           adminsCount = adminsRes.meta?.total || 0;
         } catch (err) {
-          console.error('Failed to fetch admins:', err.response?.data || err.message);
+          // Error fetching admins
         }
 
         // Fetch pet types
         try {
           const petTypesRes = await adminPetTypesService.getAllPetTypes(1, 1);
-          console.log('Pet Types response:', petTypesRes);
           petTypesCount = petTypesRes.meta?.total || 0;
         } catch (err) {
-          console.error('Failed to fetch pet types:', err.response?.data || err.message);
+          // Error fetching pet types
         }
 
         setStats({
@@ -67,7 +63,7 @@ const Dashboard = () => {
           petTypes: petTypesCount,
         });
       } catch (error) {
-        console.error('Failed to fetch stats:', error);
+        // Error fetching stats
       } finally {
         setLoading(false);
       }

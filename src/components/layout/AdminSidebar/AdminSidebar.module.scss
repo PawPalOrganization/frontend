@@ -9,15 +9,23 @@
   top: 0;
   z-index: 1000;
   transition: transform 0.3s ease;
+  transform: translateX(0);
 
-  // Mobile: Hide by default, slide in when open
-  @media (max-width: 768px) {
+  // When closed, slide out to the left
+  &:not(.open) {
     transform: translateX(-100%);
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  }
 
+  // XL screens (>1200px): Subtle shadow when visible
+  @media (min-width: 1201px) {
     &.open {
-      transform: translateX(0);
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
     }
+  }
+
+  // Smaller screens (≤1200px): Stronger shadow (overlay effect)
+  @media (max-width: 1200px) {
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   }
 }
 

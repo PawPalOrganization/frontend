@@ -1,5 +1,12 @@
 .petsPage {
   padding: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden; // Prevent horizontal scroll on page level
+
+  @media (max-width: 768px) {
+    padding: 0;
+  }
 }
 
 .header {

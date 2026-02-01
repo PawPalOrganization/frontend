@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
-import adminUsersService from '../../services/adminUsersService';
+import adminAdminsService from '../../services/adminAdminsService';
 import DataTable from '../../components/common/DataTable/DataTable';
 import Button from '../../components/common/Button/Button';
 import Modal from '../../components/common/Modal/Modal';
 import Input from '../../components/common/Input/Input';
 import TablePageSkeleton from '../../components/common/Skeleton/TablePageSkeleton';
-import styles from './Users.module.scss';
+import styles from './Admins.module.scss';
 
-const Users = () => {
-  const [users, setUsers] = useState([]);
+const Admins = () => {
+  const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -19,87 +19,75 @@ const Users = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedAdmin, setSelectedAdmin] = useState(null);
 
   // Form state
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
-    phoneNumber: '',
     password: '',
-    birthDate: '',
-    gender: 'male',
   });
   const [formErrors, setFormErrors] = useState({});
   const [submitLoading, setSubmitLoading] = useState(false);
 
-  // Fetch users
-  const fetchUsers = async (page = 1, search = '') => {
+  // Fetch admins
+  const fetchAdmins = async (page = 1, search = '') => {
     setLoading(true);
     try {
-      const response = await adminUsersService.getAllUsers(page, 10, search);
-      setUsers(response.data || []);
+      const response = await adminAdminsService.getAllAdmins(page, 10, search);
+      setAdmins(response.data || []);
       setTotalPages(response.meta?.totalPages || 1);
       setTotalItems(response.meta?.total || 0);
       setCurrentPage(page);
     } catch (error) {
-      // Error fetching users
+      // Error fetching admins
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchUsers(1, searchTerm);
+    fetchAdmins(1, searchTerm);
   }, []);
 
   // Handle search
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
-    fetchUsers(1, value);
+    fetchAdmins(1, value);
   };
 
   // Handle page change
   const handlePageChange = (page) => {
-    fetchUsers(page, searchTerm);
+    fetchAdmins(page, searchTerm);
   };
 
   // Open create modal
   const handleCreate = () => {
     setFormData({
-      firstName: '',
-      lastName: '',
+      name: '',
       email: '',
-      phoneNumber: '',
       password: '',
-      birthDate: '',
-      gender: 'male',
     });
     setFormErrors({});
     setIsCreateModalOpen(true);
   };
 
   // Open edit modal
-  const handleEdit = (user) => {
-    setSelectedUser(user);
+  const handleEdit = (admin) => {
+    setSelectedAdmin(admin);
     setFormData({
-      firstName: user.firstName || '',
-      lastName: user.lastName || '',
-      email: user.email || '',
-      phoneNumber: user.phoneNumber || '',
+      name: admin.name || '',
+      email: admin.email || '',
       password: '', // Don't pre-fill password
-      birthDate: user.birthDate ? user.birthDate.split('T')[0] : '',
-      gender: user.gender || 'male',
     });
     setFormErrors({});
     setIsEditModalOpen(true);
   };
 
   // Open delete modal
-  const handleDeleteClick = (user) => {
-    setSelectedUser(user);
+  const handleDeleteClick = (admin) => {
+    setSelectedAdmin(admin);
     setIsDeleteModalOpen(true);
   };
 
@@ -107,12 +95,8 @@ const Users = () => {
   const validateForm = (isEdit = false) => {
     const errors = {};
 
-    if (!formData.firstName.trim()) {
-      errors.firstName = 'First name is required';
-    }
-
-    if (!formData.lastName.trim()) {
-      errors.lastName = 'Last name is required';
+    if (!formData.name.trim()) {
+      errors.name = 'Admin name is required';
     }
 
     if (!formData.email.trim()) {
@@ -125,14 +109,6 @@ const Users = () => {
       errors.password = 'Password is required';
     } else if (!isEdit && formData.password.length < 6) {
       errors.password = 'Password must be at least 6 characters';
-    }
-
-    if (!formData.phoneNumber.trim()) {
-      errors.phoneNumber = 'Phone number is required';
-    }
-
-    if (!formData.birthDate) {
-      errors.birthDate = 'Birth date is required';
     }
 
     setFormErrors(errors);
@@ -154,12 +130,12 @@ const Users = () => {
 
     setSubmitLoading(true);
     try {
-      await adminUsersService.createUser(formData);
+      await adminAdminsService.createAdmin(formData);
       setIsCreateModalOpen(false);
-      fetchUsers(currentPage, searchTerm);
+      fetchAdmins(currentPage, searchTerm);
     } catch (error) {
       setFormErrors({
-        form: error.response?.data?.message || 'Failed to create user',
+        form: error.response?.data?.message || 'Failed to create admin',
       });
     } finally {
       setSubmitLoading(false);
@@ -178,12 +154,12 @@ const Users = () => {
         delete updateData.password;
       }
 
-      await adminUsersService.updateUser(selectedUser.id, updateData);
+      await adminAdminsService.updateAdmin(selectedAdmin.id, updateData);
       setIsEditModalOpen(false);
-      fetchUsers(currentPage, searchTerm);
+      fetchAdmins(currentPage, searchTerm);
     } catch (error) {
       setFormErrors({
-        form: error.response?.data?.message || 'Failed to update user',
+        form: error.response?.data?.message || 'Failed to update admin',
       });
     } finally {
       setSubmitLoading(false);
@@ -194,11 +170,11 @@ const Users = () => {
   const handleDeleteSubmit = async () => {
     setSubmitLoading(true);
     try {
-      await adminUsersService.deleteUser(selectedUser.id);
+      await adminAdminsService.deleteAdmin(selectedAdmin.id);
       setIsDeleteModalOpen(false);
-      fetchUsers(currentPage, searchTerm);
+      fetchAdmins(currentPage, searchTerm);
     } catch (error) {
-      alert('Failed to delete user');
+      alert('Failed to delete admin');
     } finally {
       setSubmitLoading(false);
     }
@@ -207,62 +183,42 @@ const Users = () => {
   // Table columns
   const columns = [
     {
-      key: 'firstName',
-      label: 'First Name',
-      width: '15%',
-    },
-    {
-      key: 'lastName',
-      label: 'Last Name',
-      width: '15%',
+      key: 'name',
+      label: 'Name',
+      width: '30%',
     },
     {
       key: 'email',
       label: 'Email',
-      width: '25%',
-    },
-    {
-      key: 'phoneNumber',
-      label: 'Phone',
-      width: '15%',
-    },
-    {
-      key: 'gender',
-      label: 'Gender',
-      width: '10%',
-      render: (row) => (
-        <span className={styles.badge}>
-          {row.gender || 'N/A'}
-        </span>
-      ),
+      width: '40%',
     },
     {
       key: 'createdAt',
-      label: 'Joined',
-      width: '15%',
+      label: 'Created',
+      width: '30%',
       render: (row) => new Date(row.createdAt).toLocaleDateString(),
     },
   ];
 
   // Show full-page skeleton on initial load
-  if (loading && users.length === 0) {
-    return <TablePageSkeleton columns={6} rows={8} />;
+  if (loading && admins.length === 0) {
+    return <TablePageSkeleton columns={3} rows={8} />;
   }
 
   return (
-    <div className={styles.usersPage}>
+    <div className={styles.adminsPage}>
       {/* Page Header */}
       <div className={styles.header}>
         <div>
-          <h1 className={styles.title}>Users Management</h1>
-          <p className={styles.subtitle}>Manage all registered users</p>
+          <h1 className={styles.title}>Admins Management</h1>
+          <p className={styles.subtitle}>Manage admin accounts</p>
         </div>
         <Button
           variant="primary"
           icon="bi-plus-lg"
           onClick={handleCreate}
         >
-          Add User
+          Add Admin
         </Button>
       </div>
 
@@ -272,7 +228,7 @@ const Users = () => {
           <i className="bi bi-search"></i>
           <input
             type="text"
-            placeholder="Search users by name or email..."
+            placeholder="Search admins..."
             value={searchTerm}
             onChange={handleSearch}
             className={styles.searchInput}
@@ -283,7 +239,7 @@ const Users = () => {
       {/* Data Table */}
       <DataTable
         columns={columns}
-        data={users}
+        data={admins}
         loading={loading}
         currentPage={currentPage}
         totalPages={totalPages}
@@ -291,14 +247,14 @@ const Users = () => {
         onPageChange={handlePageChange}
         onEdit={handleEdit}
         onDelete={handleDeleteClick}
-        emptyMessage="No users found"
+        emptyMessage="No admins found"
       />
 
       {/* Create Modal */}
       <Modal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        title="Create New User"
+        title="Create New Admin"
         size="medium"
         footer={
           <>
@@ -314,7 +270,7 @@ const Users = () => {
               onClick={handleCreateSubmit}
               loading={submitLoading}
             >
-              Create User
+              Create Admin
             </Button>
           </>
         }
@@ -324,26 +280,16 @@ const Users = () => {
             <div className="alert alert-danger">{formErrors.form}</div>
           )}
 
-          <div className={styles.formRow}>
-            <Input
-              label="First Name"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleInputChange}
-              error={formErrors.firstName}
-              placeholder="John"
-              required
-            />
-            <Input
-              label="Last Name"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleInputChange}
-              error={formErrors.lastName}
-              placeholder="Doe"
-              required
-            />
-          </div>
+          <Input
+            label="Name"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            error={formErrors.name}
+            placeholder="Admin name"
+            icon="bi-person"
+            required
+          />
 
           <Input
             label="Email"
@@ -352,20 +298,8 @@ const Users = () => {
             value={formData.email}
             onChange={handleInputChange}
             error={formErrors.email}
-            placeholder="john.doe@example.com"
+            placeholder="admin@example.com"
             icon="bi-envelope"
-            required
-          />
-
-          <Input
-            label="Phone Number"
-            type="tel"
-            name="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={handleInputChange}
-            error={formErrors.phoneNumber}
-            placeholder="+1234567890"
-            icon="bi-telephone"
             required
           />
 
@@ -380,33 +314,6 @@ const Users = () => {
             icon="bi-lock"
             required
           />
-
-          <div className={styles.formRow}>
-            <Input
-              label="Birth Date"
-              type="date"
-              name="birthDate"
-              value={formData.birthDate}
-              onChange={handleInputChange}
-              error={formErrors.birthDate}
-              required
-            />
-
-            <div>
-              <label className={styles.label}>
-                Gender <span style={{ color: '#E74C3C' }}>*</span>
-              </label>
-              <select
-                name="gender"
-                value={formData.gender}
-                onChange={handleInputChange}
-                className={styles.select}
-              >
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-              </select>
-            </div>
-          </div>
         </div>
       </Modal>
 
@@ -414,7 +321,7 @@ const Users = () => {
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        title="Edit User"
+        title="Edit Admin"
         size="medium"
         footer={
           <>
@@ -440,26 +347,16 @@ const Users = () => {
             <div className="alert alert-danger">{formErrors.form}</div>
           )}
 
-          <div className={styles.formRow}>
-            <Input
-              label="First Name"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleInputChange}
-              error={formErrors.firstName}
-              placeholder="John"
-              required
-            />
-            <Input
-              label="Last Name"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleInputChange}
-              error={formErrors.lastName}
-              placeholder="Doe"
-              required
-            />
-          </div>
+          <Input
+            label="Name"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            error={formErrors.name}
+            placeholder="Admin name"
+            icon="bi-person"
+            required
+          />
 
           <Input
             label="Email"
@@ -468,20 +365,8 @@ const Users = () => {
             value={formData.email}
             onChange={handleInputChange}
             error={formErrors.email}
-            placeholder="john.doe@example.com"
+            placeholder="admin@example.com"
             icon="bi-envelope"
-            required
-          />
-
-          <Input
-            label="Phone Number"
-            type="tel"
-            name="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={handleInputChange}
-            error={formErrors.phoneNumber}
-            placeholder="+1234567890"
-            icon="bi-telephone"
             required
           />
 
@@ -495,33 +380,6 @@ const Users = () => {
             placeholder="Leave empty to keep current password"
             icon="bi-lock"
           />
-
-          <div className={styles.formRow}>
-            <Input
-              label="Birth Date"
-              type="date"
-              name="birthDate"
-              value={formData.birthDate}
-              onChange={handleInputChange}
-              error={formErrors.birthDate}
-              required
-            />
-
-            <div>
-              <label className={styles.label}>
-                Gender <span style={{ color: '#E74C3C' }}>*</span>
-              </label>
-              <select
-                name="gender"
-                value={formData.gender}
-                onChange={handleInputChange}
-                className={styles.select}
-              >
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-              </select>
-            </div>
-          </div>
         </div>
       </Modal>
 
@@ -529,7 +387,7 @@ const Users = () => {
       <Modal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
-        title="Delete User"
+        title="Delete Admin"
         size="small"
         footer={
           <>
@@ -552,14 +410,11 @@ const Users = () => {
       >
         <p>
           Are you sure you want to delete{' '}
-          <strong>
-            {selectedUser?.firstName} {selectedUser?.lastName}
-          </strong>
-          ? This action cannot be undone.
+          <strong>{selectedAdmin?.name}</strong>? This action cannot be undone.
         </p>
       </Modal>
     </div>
   );
 };
 
-export default Users;
+export default Admins;

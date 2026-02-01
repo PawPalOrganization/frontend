@@ -4,15 +4,36 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   width: 100%;
+  max-width: 100%; // Prevent overflow from parent
 
-  @media (max-width: 768px) {
+  @media (max-width: 991px) {
     border-radius: 8px;
+    // Ensure container respects viewport on tablets and mobile
+    max-width: calc(100vw - 2rem); // Account for page padding
   }
 }
 
 .tableWrapper {
   overflow-x: auto;
+  overflow-y: visible;
   -webkit-overflow-scrolling: touch; // Smooth scrolling on iOS
+  position: relative;
+
+  // Scroll fade indicator on tablets and mobile (shows there's more content)
+  @media (max-width: 991px) {
+    &::after {
+      content: '';
+      position: sticky;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 40px;
+      background: linear-gradient(to left, rgba(255, 255, 255, 0.9), transparent);
+      pointer-events: none;
+      float: right;
+      height: 100%;
+    }
+  }
 
   // Add scrollbar styling for better UX
   &::-webkit-scrollbar {
@@ -21,6 +42,7 @@
 
   &::-webkit-scrollbar-track {
     background: #f1f1f1;
+    border-radius: 4px;
   }
 
   &::-webkit-scrollbar-thumb {
@@ -31,6 +53,12 @@
   &::-webkit-scrollbar-thumb:hover {
     background: #555;
   }
+
+  @media (max-width: 991px) {
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+  }
 }
 
 .table {
@@ -38,8 +66,8 @@
   min-width: 800px; // Prevent table from getting too squished
   border-collapse: collapse;
 
-  @media (max-width: 768px) {
-    min-width: 600px; // Smaller min-width on mobile
+  @media (max-width: 991px) {
+    min-width: 700px; // Maintain table structure on tablets/mobile
   }
 
   thead {
@@ -56,7 +84,7 @@
       letter-spacing: 0.5px;
       white-space: nowrap; // Prevent header wrapping
 
-      @media (max-width: 768px) {
+      @media (max-width: 991px) {
         padding: 12px 8px;
         font-size: 12px;
       }
@@ -83,7 +111,7 @@
       color: #2C3E50;
       vertical-align: middle;
 
-      @media (max-width: 768px) {
+      @media (max-width: 991px) {
         padding: 12px 8px;
         font-size: 13px;
       }
@@ -142,7 +170,7 @@
   flex-wrap: wrap;
   gap: 12px;
 
-  @media (max-width: 768px) {
+  @media (max-width: 991px) {
     padding: 12px;
     flex-direction: column;
     align-items: stretch;
@@ -154,7 +182,7 @@
   color: #6C757D;
   font-weight: 500;
 
-  @media (max-width: 768px) {
+  @media (max-width: 991px) {
     font-size: 12px;
     text-align: center;
   }
@@ -167,7 +195,7 @@
   flex-wrap: wrap;
   justify-content: center;
 
-  @media (max-width: 768px) {
+  @media (max-width: 991px) {
     width: 100%;
     justify-content: center;
   }
@@ -189,7 +217,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
 
-  @media (max-width: 768px) {
+  @media (max-width: 991px) {
     min-width: 32px;
     height: 32px;
     padding: 0 8px;

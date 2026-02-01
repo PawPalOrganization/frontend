@@ -1,11 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 import styles from './Login.module.scss';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAdminAuth();
+  const { login, isAuthenticated, loading: authLoading } = useAdminAuth();
+  const isLoggingIn = useRef(false);
+
+  // Redirect if already authenticated (but not during login attempt)
+  useEffect(() => {
+    if (isAuthenticated && !isLoggingIn.current && !authLoading) {
+      navigate('/admin/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, authLoading, navigate]);
 
   const [formData, setFormData] = useState({
     email: '',
@@ -55,14 +63,18 @@ const Login = () => {
     }
 
     setLoading(true);
+    isLoggingIn.current = true; // Mark login attempt in progress
 
     try {
       await login({
         email: formData.email,
         password: formData.password,
       });
-      navigate('/admin/dashboard');
+      // Success - let the useEffect handle navigation
+      isLoggingIn.current = false;
     } catch (error) {
+      // Failed login - stay on page with error
+      isLoggingIn.current = false;
       setErrors({
         form: error.message || 'Login failed. Please check your credentials.',
       });

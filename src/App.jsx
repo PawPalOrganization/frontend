@@ -1,10 +1,13 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AdminAuthProvider } from './context/AdminAuthContext';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 import AdminLayout from './components/layout/AdminLayout/AdminLayout';
 import Login from './pages/Login/Login';
 import Dashboard from './pages/Admin/Dashboard';
 import Users from './pages/Admin/Users';
 import Pets from './pages/Admin/Pets';
+import PetTypes from './pages/Admin/PetTypes';
+import Admins from './pages/Admin/Admins';
 
 function App() {
   return (
@@ -15,14 +18,21 @@ function App() {
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
 
-          {/* Admin Dashboard Routes */}
-          <Route path="/admin" element={<AdminLayout />}>
+          {/* Admin Dashboard Routes - Protected */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
             <Route index element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="users" element={<Users />} />
             <Route path="pets" element={<Pets />} />
-            <Route path="pet-types" element={<div>Pet Types Management</div>} />
-            <Route path="admins" element={<div>Admins Management</div>} />
+            <Route path="pet-types" element={<PetTypes />} />
+            <Route path="admins" element={<Admins />} />
             <Route path="account" element={<div>Account Settings</div>} />
             <Route path="settings" element={<div>Settings</div>} />
           </Route>

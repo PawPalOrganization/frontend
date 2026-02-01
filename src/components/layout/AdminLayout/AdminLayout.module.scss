@@ -6,7 +6,9 @@
 }
 
 .hamburger {
-  display: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: fixed;
   top: 1rem;
   left: 1rem;
@@ -31,16 +33,21 @@
     transform: scale(0.95);
   }
 
-  // Show on tablets and mobile
-  @media (max-width: 768px) {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  // On smaller screens, move close button to top right when sidebar is open
+  @media (max-width: 1200px) {
+    &.hamburgerOpen {
+      left: auto;
+      right: 1rem;
+    }
+  }
+
+  // On larger screens, keep button on left always
+  @media (min-width: 1201px) {
+    left: 1rem;
   }
 }
 
 .overlay {
-  display: none;
   position: fixed;
   top: 0;
   left: 0;
@@ -49,30 +56,37 @@
   background: rgba(0, 0, 0, 0.5);
   z-index: 999;
   backdrop-filter: blur(2px);
+  opacity: 1;
+  transition: opacity 0.3s ease;
 
-  @media (max-width: 768px) {
-    display: block;
+  // Only show overlay on screens <= 1200px
+  @media (min-width: 1201px) {
+    display: none;
   }
 }
 
 .mainContent {
   flex: 1;
-  margin-left: 250px; // Sidebar width
+  margin-left: 250px; // Sidebar width when open
   min-height: 100vh;
   transition: margin-left 0.3s ease;
 
-  // Remove left margin on mobile
-  @media (max-width: 768px) {
+  &.sidebarClosed {
+    margin-left: 0; // No margin when sidebar is closed
+  }
+
+  // On screens <= 1200px, always no margin (sidebar overlays)
+  @media (max-width: 1200px) {
     margin-left: 0;
   }
 }
 
 .contentWrapper {
-  padding: 2rem;
+  padding: 5rem 2rem 2rem 2rem; // Top padding for hamburger on all screens
   max-width: 1400px;
   margin: 0 auto;
 
-  // Add top padding on mobile to account for hamburger button
+  // Add more top padding on mobile
   @media (max-width: 768px) {
     padding: 5rem 1rem 2rem 1rem;
   }

@@ -6,6 +6,7 @@ import DataTable from '../../components/common/DataTable/DataTable';
 import Button from '../../components/common/Button/Button';
 import Modal from '../../components/common/Modal/Modal';
 import Input from '../../components/common/Input/Input';
+import TablePageSkeleton from '../../components/common/Skeleton/TablePageSkeleton';
 import styles from './Pets.module.scss';
 
 const Pets = () => {
@@ -50,7 +51,7 @@ const Pets = () => {
       setTotalItems(response.meta?.total || 0);
       setCurrentPage(page);
     } catch (error) {
-      console.error('Failed to fetch pets:', error);
+      // Error fetching pets
     } finally {
       setLoading(false);
     }
@@ -62,7 +63,7 @@ const Pets = () => {
       const response = await adminUsersService.getUsersForDropdown();
       setUsers(response.data || []);
     } catch (error) {
-      console.error('Failed to fetch users:', error);
+      // Error fetching users
     }
   };
 
@@ -72,7 +73,7 @@ const Pets = () => {
       const response = await adminPetTypesService.getAllPetTypes(1, 100);
       setPetTypes(response.data || []);
     } catch (error) {
-      console.error('Failed to fetch pet types:', error);
+      // Error fetching pet types
     }
   };
 
@@ -266,7 +267,6 @@ const Pets = () => {
       setIsDeleteModalOpen(false);
       fetchPets(currentPage, searchTerm);
     } catch (error) {
-      console.error('Failed to delete pet:', error);
       alert('Failed to delete pet');
     } finally {
       setSubmitLoading(false);
@@ -338,6 +338,11 @@ const Pets = () => {
       render: (row) => new Date(row.createdAt).toLocaleDateString(),
     },
   ];
+
+  // Show full-page skeleton on initial load
+  if (loading && pets.length === 0) {
+    return <TablePageSkeleton columns={8} rows={8} />;
+  }
 
   return (
     <div className={styles.petsPage}>
