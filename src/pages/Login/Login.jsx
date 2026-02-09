@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 import styles from './Login.module.scss';
+import logoPawBuddy from '../../assets/images/login/Logo Paw Buddy.png';
+import dogImage from '../../assets/images/login/dog.png';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -92,7 +94,7 @@ const Login = () => {
             {/* Logo */}
             <div className={styles.logo}>
               <img
-                src="/src/assets/images/login/Logo Paw Buddy.png"
+                src={logoPawBuddy}
                 alt="Paw Buddy Logo"
                 style={{ maxWidth: '150px' }}
                 className="img-fluid"
@@ -103,7 +105,7 @@ const Login = () => {
             <div className="flex-grow-1 d-flex align-items-center justify-content-center">
               <div className={styles.dogImagePlaceholder}>
                 <img
-                  src="/src/assets/images/login/dog.png"
+                  src={dogImage}
                   alt="Happy dog with toy"
                   className="img-fluid"
                 />

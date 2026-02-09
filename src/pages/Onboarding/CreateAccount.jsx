@@ -3,6 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { ROUTES } from '../../constants/routes';
 import styles from './CreateAccount.module.scss';
+import logoPawBuddy from '../../assets/images/login/Logo Paw Buddy.png';
+import dogImage from '../../assets/images/login/dog.png';
 
 const CreateAccount = () => {
   const navigate = useNavigate();
@@ -125,7 +127,7 @@ const CreateAccount = () => {
             {/* Logo */}
             <div className={styles.logo}>
               <img
-                src="/src/assets/images/login/Logo Paw Buddy.png"
+                src={logoPawBuddy}
                 alt="Paw Buddy Logo"
                 style={{ maxWidth: '150px' }}
                 className="img-fluid"
@@ -136,7 +138,7 @@ const CreateAccount = () => {
             <div className="flex-grow-1 d-flex align-items-center justify-content-center">
               <div className={styles.dogImagePlaceholder}>
                 <img
-                  src="/src/assets/images/login/dog.png"
+                  src={dogImage}
                   alt="Happy dog with toy"
                   className="img-fluid"
                 />
