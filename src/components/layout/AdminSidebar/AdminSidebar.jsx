@@ -17,6 +17,7 @@ const AdminSidebar = ({ isOpen = false, onClose = () => {} }) => {
     { path: '/admin/users', icon: 'bi-people', label: 'Users' },
     { path: '/admin/pets', icon: 'bi-heart', label: 'Pets' },
     { path: '/admin/pet-types', icon: 'bi-tag', label: 'Pet Types' },
+    { path: '/admin/pet-type-breeds', icon: 'bi-tags', label: 'Breeds' },
     { path: '/admin/admins', icon: 'bi-shield', label: 'Admins' },
   ];
 
@@ -34,6 +35,15 @@ const AdminSidebar = ({ isOpen = false, onClose = () => {} }) => {
 
   return (
     <div className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
+      {/* Close Button - Top Right */}
+      <button
+        className={styles.closeButton}
+        onClick={onClose}
+        aria-label="Close sidebar"
+      >
+        <i className="bi bi-x"></i>
+      </button>
+
       {/* Logo */}
       <div className={styles.logo}>
         <img

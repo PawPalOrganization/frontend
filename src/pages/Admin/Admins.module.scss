@@ -88,6 +88,12 @@
   &::placeholder {
     color: #ADB5BD;
   }
+
+  &:disabled {
+    background: #F8F9FA;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
 }
 
 .form {

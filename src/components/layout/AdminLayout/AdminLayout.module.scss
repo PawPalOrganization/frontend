@@ -5,6 +5,33 @@
   position: relative;
 }
 
+@keyframes hamburgerSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes hamburgerSlideOut {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-20px);
+    pointer-events: none;
+  }
+}
+
 .hamburger {
   display: flex;
   align-items: center;
@@ -21,30 +48,29 @@
   color: white;
   font-size: 24px;
   cursor: pointer;
-  transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 
   &:hover {
     background: #252938;
-    transform: scale(1.05);
   }
 
   &:active {
     transform: scale(0.95);
   }
 
-  // On smaller screens, move close button to top right when sidebar is open
-  @media (max-width: 1200px) {
-    &.hamburgerOpen {
-      left: auto;
-      right: 1rem;
-    }
-  }
-
-  // On larger screens, keep button on left always
+  // On larger screens, keep consistent positioning
   @media (min-width: 1201px) {
     left: 1rem;
   }
+}
+
+.hamburgerVisible {
+  animation: hamburgerSlideIn 0.35s ease forwards;
+}
+
+.hamburgerHidden {
+  animation: hamburgerSlideOut 0.25s ease forwards;
+  pointer-events: none;
 }
 
 .overlay {

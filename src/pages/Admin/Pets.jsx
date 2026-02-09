@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import adminPetsService from '../../services/adminPetsService';
 import adminUsersService from '../../services/adminUsersService';
 import adminPetTypesService from '../../services/adminPetTypesService';
+import adminPetTypeBreedsService from '../../services/adminPetTypeBreedsService';
 import DataTable from '../../components/common/DataTable/DataTable';
 import Button from '../../components/common/Button/Button';
 import Modal from '../../components/common/Modal/Modal';
@@ -20,6 +21,7 @@ const Pets = () => {
   // Dropdowns data
   const [users, setUsers] = useState([]);
   const [petTypes, setPetTypes] = useState([]);
+  const [breeds, setBreeds] = useState([]);
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -32,14 +34,20 @@ const Pets = () => {
     name: '',
     userId: '',
     petTypeId: '',
-    breed: '',
-    birthDate: '',
+    petTypeBreedId: '',
+    birthdate: '',
     gender: 'Male',
     size: 'Medium',
     weight: '',
+    age: '',
+    notes: '',
+    imageUrl: '',
+    adoptionDate: '',
   });
   const [formErrors, setFormErrors] = useState({});
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+  const searchTimerRef = useRef(null);
 
   // Fetch pets
   const fetchPets = async (page = 1, search = '') => {
@@ -77,17 +85,34 @@ const Pets = () => {
     }
   };
 
+  // Fetch breeds for dropdown (filtered by petTypeId)
+  const fetchBreeds = async (petTypeId) => {
+    if (!petTypeId) {
+      setBreeds([]);
+      return;
+    }
+    try {
+      const response = await adminPetTypeBreedsService.getAllPetTypeBreeds(1, 100, petTypeId);
+      setBreeds(response.data || []);
+    } catch (error) {
+      // Error fetching breeds
+    }
+  };
+
   useEffect(() => {
     fetchPets(1, searchTerm);
     fetchUsers();
     fetchPetTypes();
   }, []);
 
-  // Handle search
+  // Handle search with debounce
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
-    fetchPets(1, value);
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    searchTimerRef.current = setTimeout(() => {
+      fetchPets(1, value);
+    }, 600);
   };
 
   // Handle page change
@@ -101,12 +126,17 @@ const Pets = () => {
       name: '',
       userId: '',
       petTypeId: '',
-      breed: '',
-      birthDate: '',
+      petTypeBreedId: '',
+      birthdate: '',
       gender: 'Male',
       size: 'Medium',
       weight: '',
+      age: '',
+      notes: '',
+      imageUrl: '',
+      adoptionDate: '',
     });
+    setBreeds([]);
     setFormErrors({});
     setIsCreateModalOpen(true);
   };
@@ -118,19 +148,28 @@ const Pets = () => {
       name: pet.name || '',
       userId: pet.userId || '',
       petTypeId: pet.petTypeId || '',
-      breed: pet.breed || '',
-      birthDate: pet.birthDate ? pet.birthDate.split('T')[0] : '',
+      petTypeBreedId: pet.petTypeBreedId || '',
+      birthdate: pet.birthdate ? pet.birthdate.split('T')[0] : '',
       gender: pet.gender || 'Male',
       size: pet.size || 'Medium',
       weight: pet.weight || '',
+      age: pet.age || '',
+      notes: pet.notes || '',
+      imageUrl: pet.imageUrl || '',
+      adoptionDate: pet.adoptionDate ? pet.adoptionDate.split('T')[0] : '',
     });
     setFormErrors({});
     setIsEditModalOpen(true);
+    // Load breeds for the pet's type
+    if (pet.petTypeId) {
+      fetchBreeds(pet.petTypeId);
+    }
   };
 
   // Open delete modal
   const handleDeleteClick = (pet) => {
     setSelectedPet(pet);
+    setDeleteError('');
     setIsDeleteModalOpen(true);
   };
 
@@ -150,16 +189,12 @@ const Pets = () => {
       errors.petTypeId = 'Pet type is required';
     }
 
-    if (!formData.breed.trim()) {
-      errors.breed = 'Breed is required';
+    if (!formData.petTypeBreedId) {
+      errors.petTypeBreedId = 'Breed is required';
     }
 
-    if (!formData.birthDate) {
-      errors.birthDate = 'Birth date is required';
-    }
-
-    if (formData.weight && isNaN(formData.weight)) {
-      errors.weight = 'Weight must be a number';
+    if (formData.adoptionDate && formData.birthdate && formData.adoptionDate < formData.birthdate) {
+      errors.adoptionDate = 'Adoption date cannot be before birthdate';
     }
 
     setFormErrors(errors);
@@ -173,6 +208,23 @@ const Pets = () => {
     if (formErrors[name]) {
       setFormErrors((prev) => ({ ...prev, [name]: '' }));
     }
+
+    // When pet type changes, reload breeds and reset breed selection
+    if (name === 'petTypeId') {
+      setFormData((prev) => ({ ...prev, petTypeId: value, petTypeBreedId: '' }));
+      fetchBreeds(value);
+    }
+  };
+
+  // Format weight: auto-append "kg" and normalize existing variants (KG, Kg, kG) to "kg"
+  const formatWeight = (value) => {
+    if (!value) return undefined;
+    const trimmed = value.trim();
+    if (!trimmed) return undefined;
+    if (/kg/i.test(trimmed)) {
+      return trimmed.replace(/\s*kg\s*$/i, ' kg').trim();
+    }
+    return `${trimmed} kg`;
   };
 
   // Submit create
@@ -181,28 +233,19 @@ const Pets = () => {
 
     setSubmitLoading(true);
     try {
-      // Calculate age from birthDate
-      const calculateAge = (birthDate) => {
-        const today = new Date();
-        const birth = new Date(birthDate);
-        let age = today.getFullYear() - birth.getFullYear();
-        const monthDiff = today.getMonth() - birth.getMonth();
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-          age--;
-        }
-        return Math.max(0, age);
-      };
-
-      // Convert to API format
       const petData = {
         name: formData.name,
         userId: parseInt(formData.userId, 10),
         petTypeId: parseInt(formData.petTypeId, 10),
-        breed: formData.breed,
-        age: calculateAge(formData.birthDate),
-        gender: formData.gender, // Already capitalized from form
-        size: formData.size, // Already capitalized from form
-        weight: formData.weight ? parseFloat(formData.weight) : null,
+        petTypeBreedId: parseInt(formData.petTypeBreedId, 10),
+        gender: formData.gender,
+        size: formData.size,
+        weight: formatWeight(formData.weight),
+        age: formData.age || undefined,
+        notes: formData.notes || undefined,
+        imageUrl: formData.imageUrl || undefined,
+        birthdate: formData.birthdate || undefined,
+        adoptionDate: formData.adoptionDate || undefined,
       };
 
       await adminPetsService.createPet(petData);
@@ -223,28 +266,19 @@ const Pets = () => {
 
     setSubmitLoading(true);
     try {
-      // Calculate age from birthDate
-      const calculateAge = (birthDate) => {
-        const today = new Date();
-        const birth = new Date(birthDate);
-        let age = today.getFullYear() - birth.getFullYear();
-        const monthDiff = today.getMonth() - birth.getMonth();
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-          age--;
-        }
-        return Math.max(0, age);
-      };
-
-      // Convert to API format
       const petData = {
         name: formData.name,
         userId: parseInt(formData.userId, 10),
         petTypeId: parseInt(formData.petTypeId, 10),
-        breed: formData.breed,
-        age: calculateAge(formData.birthDate),
-        gender: formData.gender, // Already capitalized from form
-        size: formData.size, // Already capitalized from form
-        weight: formData.weight ? parseFloat(formData.weight) : null,
+        petTypeBreedId: parseInt(formData.petTypeBreedId, 10),
+        gender: formData.gender,
+        size: formData.size,
+        weight: formatWeight(formData.weight),
+        age: formData.age || undefined,
+        notes: formData.notes || undefined,
+        imageUrl: formData.imageUrl || undefined,
+        birthdate: formData.birthdate || undefined,
+        adoptionDate: formData.adoptionDate || undefined,
       };
 
       await adminPetsService.updatePet(selectedPet.id, petData);
@@ -262,28 +296,237 @@ const Pets = () => {
   // Submit delete
   const handleDeleteSubmit = async () => {
     setSubmitLoading(true);
+    setDeleteError('');
     try {
       await adminPetsService.deletePet(selectedPet.id);
       setIsDeleteModalOpen(false);
       fetchPets(currentPage, searchTerm);
     } catch (error) {
-      alert('Failed to delete pet');
+      const status = error.response?.status;
+      const message = error.response?.data?.message;
+      if (status === 409) {
+        setDeleteError(message || 'Cannot delete this pet because it has related records.');
+      } else {
+        setDeleteError(message || 'Failed to delete pet.');
+      }
     } finally {
       setSubmitLoading(false);
     }
   };
 
+  // Reusable form fields JSX (shared between Create and Edit modals)
+  const renderFormFields = () => (
+    <div className={styles.form}>
+      {formErrors.form && (
+        <div className="alert alert-danger">{formErrors.form}</div>
+      )}
+
+      <Input
+        label="Pet Name"
+        name="name"
+        value={formData.name}
+        onChange={handleInputChange}
+        error={formErrors.name}
+        placeholder="Buddy"
+        icon="bi-heart"
+        required
+      />
+
+      <div className={styles.formRow}>
+        <div>
+          <label className={styles.label}>
+            Owner <span style={{ color: '#E74C3C' }}>*</span>
+          </label>
+          <select
+            name="userId"
+            value={formData.userId}
+            onChange={handleInputChange}
+            className={`${styles.select} ${formErrors.userId ? styles.selectError : ''}`}
+          >
+            <option value="">Select Owner</option>
+            {users.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.firstName} {user.lastName} ({user.email})
+              </option>
+            ))}
+          </select>
+          {formErrors.userId && (
+            <span className={styles.errorText}>{formErrors.userId}</span>
+          )}
+        </div>
+
+        <div>
+          <label className={styles.label}>
+            Pet Type <span style={{ color: '#E74C3C' }}>*</span>
+          </label>
+          <select
+            name="petTypeId"
+            value={formData.petTypeId}
+            onChange={handleInputChange}
+            className={`${styles.select} ${formErrors.petTypeId ? styles.selectError : ''}`}
+          >
+            <option value="">Select Pet Type</option>
+            {petTypes.map((type) => (
+              <option key={type.id} value={type.id}>
+                {type.name}
+              </option>
+            ))}
+          </select>
+          {formErrors.petTypeId && (
+            <span className={styles.errorText}>{formErrors.petTypeId}</span>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <label className={styles.label}>
+          Breed <span style={{ color: '#E74C3C' }}>*</span>
+        </label>
+        <select
+          name="petTypeBreedId"
+          value={formData.petTypeBreedId}
+          onChange={handleInputChange}
+          className={`${styles.select} ${formErrors.petTypeBreedId ? styles.selectError : ''}`}
+          disabled={!formData.petTypeId}
+        >
+          <option value="">{formData.petTypeId ? 'Select Breed' : 'Select a pet type first'}</option>
+          {breeds.map((breed) => (
+            <option key={breed.id} value={breed.id}>
+              {breed.name}
+            </option>
+          ))}
+        </select>
+        {formErrors.petTypeBreedId && (
+          <span className={styles.errorText}>{formErrors.petTypeBreedId}</span>
+        )}
+      </div>
+
+      <div className={styles.formRow}>
+        <Input
+          label="Birthdate"
+          type="date"
+          name="birthdate"
+          value={formData.birthdate}
+          onChange={handleInputChange}
+          error={formErrors.birthdate}
+        />
+
+        <div>
+          <label className={styles.label}>
+            Gender <span style={{ color: '#E74C3C' }}>*</span>
+          </label>
+          <select
+            name="gender"
+            value={formData.gender}
+            onChange={handleInputChange}
+            className={styles.select}
+          >
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Unknown">Unknown</option>
+          </select>
+        </div>
+      </div>
+
+      <div className={styles.formRow}>
+        <div>
+          <label className={styles.label}>
+            Size <span style={{ color: '#E74C3C' }}>*</span>
+          </label>
+          <select
+            name="size"
+            value={formData.size}
+            onChange={handleInputChange}
+            className={styles.select}
+          >
+            <option value="Small">Small</option>
+            <option value="Medium">Medium</option>
+            <option value="Large">Large</option>
+            <option value="Extra Large">Extra Large</option>
+          </select>
+        </div>
+
+        <Input
+          label="Weight"
+          name="weight"
+          value={formData.weight}
+          onChange={handleInputChange}
+          error={formErrors.weight}
+          placeholder="e.g. 30 (kg auto-added)"
+        />
+      </div>
+
+      <div className={styles.formRow}>
+        <Input
+          label="Age"
+          name="age"
+          value={formData.age}
+          onChange={handleInputChange}
+          placeholder="e.g. 3 years"
+        />
+
+        <Input
+          label="Adoption Date"
+          type="date"
+          name="adoptionDate"
+          value={formData.adoptionDate}
+          onChange={handleInputChange}
+          error={formErrors.adoptionDate}
+        />
+      </div>
+
+      <Input
+        label="Notes"
+        name="notes"
+        value={formData.notes}
+        onChange={handleInputChange}
+        placeholder="Any notes about the pet..."
+      />
+
+      <Input
+        label="Image URL"
+        name="imageUrl"
+        value={formData.imageUrl}
+        onChange={handleInputChange}
+        placeholder="https://example.com/pets/photo.jpg"
+        icon="bi-image"
+      />
+
+      {formData.imageUrl && formData.imageUrl.startsWith('http') && (
+        <div className={styles.imagePreview}>
+          <img src={formData.imageUrl} alt="Preview" />
+        </div>
+      )}
+    </div>
+  );
+
   // Table columns
   const columns = [
     {
+      key: 'imageUrl',
+      label: '',
+      width: '60px',
+      render: (row) => {
+        const isValidUrl = row.imageUrl && row.imageUrl.startsWith('http');
+        return isValidUrl ? (
+          <img src={row.imageUrl} alt={row.name} className={styles.petImage} />
+        ) : (
+          <div className={styles.noImage}>
+            <i className="bi bi-image"></i>
+          </div>
+        );
+      },
+    },
+    {
       key: 'name',
       label: 'Pet Name',
-      width: '15%',
+      width: '14%',
     },
     {
       key: 'breed',
       label: 'Breed',
-      width: '15%',
+      width: '14%',
+      render: (row) => row.petTypeBreed?.name || 'N/A',
     },
     {
       key: 'petType',
@@ -291,17 +534,17 @@ const Pets = () => {
       width: '10%',
       render: (row) => (
         <span className={styles.badge}>
-          {row.PetType?.name || 'N/A'}
+          {row.petType?.name || 'N/A'}
         </span>
       ),
     },
     {
       key: 'owner',
       label: 'Owner',
-      width: '20%',
+      width: '16%',
       render: (row) => (
         <span>
-          {row.User ? `${row.User.firstName} ${row.User.lastName}` : 'N/A'}
+          {row.user ? `${row.user.firstName} ${row.user.lastName}` : 'N/A'}
         </span>
       ),
     },
@@ -329,13 +572,7 @@ const Pets = () => {
       key: 'weight',
       label: 'Weight',
       width: '10%',
-      render: (row) => (row.weight ? `${row.weight} kg` : 'N/A'),
-    },
-    {
-      key: 'createdAt',
-      label: 'Added',
-      width: '10%',
-      render: (row) => new Date(row.createdAt).toLocaleDateString(),
+      render: (row) => row.weight || 'N/A',
     },
   ];
 
@@ -371,6 +608,7 @@ const Pets = () => {
             value={searchTerm}
             onChange={handleSearch}
             className={styles.searchInput}
+            disabled={loading}
           />
         </div>
       </div>
@@ -414,136 +652,7 @@ const Pets = () => {
           </>
         }
       >
-        <div className={styles.form}>
-          {formErrors.form && (
-            <div className="alert alert-danger">{formErrors.form}</div>
-          )}
-
-          <Input
-            label="Pet Name"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            error={formErrors.name}
-            placeholder="Buddy"
-            icon="bi-heart"
-            required
-          />
-
-          <div className={styles.formRow}>
-            <div>
-              <label className={styles.label}>
-                Owner <span style={{ color: '#E74C3C' }}>*</span>
-              </label>
-              <select
-                name="userId"
-                value={formData.userId}
-                onChange={handleInputChange}
-                className={`${styles.select} ${formErrors.userId ? styles.selectError : ''}`}
-              >
-                <option value="">Select Owner</option>
-                {users.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.firstName} {user.lastName} ({user.email})
-                  </option>
-                ))}
-              </select>
-              {formErrors.userId && (
-                <span className={styles.errorText}>{formErrors.userId}</span>
-              )}
-            </div>
-
-            <div>
-              <label className={styles.label}>
-                Pet Type <span style={{ color: '#E74C3C' }}>*</span>
-              </label>
-              <select
-                name="petTypeId"
-                value={formData.petTypeId}
-                onChange={handleInputChange}
-                className={`${styles.select} ${formErrors.petTypeId ? styles.selectError : ''}`}
-              >
-                <option value="">Select Pet Type</option>
-                {petTypes.map((type) => (
-                  <option key={type.id} value={type.id}>
-                    {type.name}
-                  </option>
-                ))}
-              </select>
-              {formErrors.petTypeId && (
-                <span className={styles.errorText}>{formErrors.petTypeId}</span>
-              )}
-            </div>
-          </div>
-
-          <Input
-            label="Breed"
-            name="breed"
-            value={formData.breed}
-            onChange={handleInputChange}
-            error={formErrors.breed}
-            placeholder="Golden Retriever"
-            required
-          />
-
-          <div className={styles.formRow}>
-            <Input
-              label="Birth Date"
-              type="date"
-              name="birthDate"
-              value={formData.birthDate}
-              onChange={handleInputChange}
-              error={formErrors.birthDate}
-              required
-            />
-
-            <div>
-              <label className={styles.label}>
-                Gender <span style={{ color: '#E74C3C' }}>*</span>
-              </label>
-              <select
-                name="gender"
-                value={formData.gender}
-                onChange={handleInputChange}
-                className={styles.select}
-              >
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Unknown">Unknown</option>
-              </select>
-            </div>
-          </div>
-
-          <div className={styles.formRow}>
-            <div>
-              <label className={styles.label}>
-                Size <span style={{ color: '#E74C3C' }}>*</span>
-              </label>
-              <select
-                name="size"
-                value={formData.size}
-                onChange={handleInputChange}
-                className={styles.select}
-              >
-                <option value="Small">Small</option>
-                <option value="Medium">Medium</option>
-                <option value="Large">Large</option>
-                <option value="Extra Large">Extra Large</option>
-              </select>
-            </div>
-
-            <Input
-              label="Weight (kg)"
-              type="number"
-              name="weight"
-              value={formData.weight}
-              onChange={handleInputChange}
-              error={formErrors.weight}
-              placeholder="15.5"
-              step="0.1"
-            />
-          </div>
-        </div>
+        {renderFormFields()}
       </Modal>
 
       {/* Edit Modal */}
@@ -571,136 +680,7 @@ const Pets = () => {
           </>
         }
       >
-        <div className={styles.form}>
-          {formErrors.form && (
-            <div className="alert alert-danger">{formErrors.form}</div>
-          )}
-
-          <Input
-            label="Pet Name"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            error={formErrors.name}
-            placeholder="Buddy"
-            icon="bi-heart"
-            required
-          />
-
-          <div className={styles.formRow}>
-            <div>
-              <label className={styles.label}>
-                Owner <span style={{ color: '#E74C3C' }}>*</span>
-              </label>
-              <select
-                name="userId"
-                value={formData.userId}
-                onChange={handleInputChange}
-                className={`${styles.select} ${formErrors.userId ? styles.selectError : ''}`}
-              >
-                <option value="">Select Owner</option>
-                {users.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.firstName} {user.lastName} ({user.email})
-                  </option>
-                ))}
-              </select>
-              {formErrors.userId && (
-                <span className={styles.errorText}>{formErrors.userId}</span>
-              )}
-            </div>
-
-            <div>
-              <label className={styles.label}>
-                Pet Type <span style={{ color: '#E74C3C' }}>*</span>
-              </label>
-              <select
-                name="petTypeId"
-                value={formData.petTypeId}
-                onChange={handleInputChange}
-                className={`${styles.select} ${formErrors.petTypeId ? styles.selectError : ''}`}
-              >
-                <option value="">Select Pet Type</option>
-                {petTypes.map((type) => (
-                  <option key={type.id} value={type.id}>
-                    {type.name}
-                  </option>
-                ))}
-              </select>
-              {formErrors.petTypeId && (
-                <span className={styles.errorText}>{formErrors.petTypeId}</span>
-              )}
-            </div>
-          </div>
-
-          <Input
-            label="Breed"
-            name="breed"
-            value={formData.breed}
-            onChange={handleInputChange}
-            error={formErrors.breed}
-            placeholder="Golden Retriever"
-            required
-          />
-
-          <div className={styles.formRow}>
-            <Input
-              label="Birth Date"
-              type="date"
-              name="birthDate"
-              value={formData.birthDate}
-              onChange={handleInputChange}
-              error={formErrors.birthDate}
-              required
-            />
-
-            <div>
-              <label className={styles.label}>
-                Gender <span style={{ color: '#E74C3C' }}>*</span>
-              </label>
-              <select
-                name="gender"
-                value={formData.gender}
-                onChange={handleInputChange}
-                className={styles.select}
-              >
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Unknown">Unknown</option>
-              </select>
-            </div>
-          </div>
-
-          <div className={styles.formRow}>
-            <div>
-              <label className={styles.label}>
-                Size <span style={{ color: '#E74C3C' }}>*</span>
-              </label>
-              <select
-                name="size"
-                value={formData.size}
-                onChange={handleInputChange}
-                className={styles.select}
-              >
-                <option value="Small">Small</option>
-                <option value="Medium">Medium</option>
-                <option value="Large">Large</option>
-                <option value="Extra Large">Extra Large</option>
-              </select>
-            </div>
-
-            <Input
-              label="Weight (kg)"
-              type="number"
-              name="weight"
-              value={formData.weight}
-              onChange={handleInputChange}
-              error={formErrors.weight}
-              placeholder="15.5"
-              step="0.1"
-            />
-          </div>
-        </div>
+        {renderFormFields()}
       </Modal>
 
       {/* Delete Confirmation Modal */}
@@ -728,6 +708,9 @@ const Pets = () => {
           </>
         }
       >
+        {deleteError && (
+          <div className="alert alert-danger">{deleteError}</div>
+        )}
         <p>
           Are you sure you want to delete{' '}
           <strong>{selectedPet?.name}</strong>? This action cannot be undone.

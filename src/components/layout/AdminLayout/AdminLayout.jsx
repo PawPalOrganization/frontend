@@ -32,13 +32,13 @@ const AdminLayout = () => {
 
   return (
     <div className={styles.layout}>
-      {/* Hamburger Button - Visible on mobile */}
+      {/* Hamburger Button - Animated hide/show */}
       <button
-        className={`${styles.hamburger} ${isSidebarOpen ? styles.hamburgerOpen : ''}`}
+        className={`${styles.hamburger} ${isSidebarOpen ? styles.hamburgerHidden : styles.hamburgerVisible}`}
         onClick={toggleSidebar}
         aria-label="Toggle sidebar"
       >
-        <i className={`bi bi-${isSidebarOpen ? 'x' : 'list'}`}></i>
+        <i className="bi bi-list"></i>
       </button>
 
       {/* Overlay - Visible when sidebar is open on mobile */}

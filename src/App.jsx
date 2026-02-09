@@ -7,6 +7,7 @@ import Dashboard from './pages/Admin/Dashboard';
 import Users from './pages/Admin/Users';
 import Pets from './pages/Admin/Pets';
 import PetTypes from './pages/Admin/PetTypes';
+import PetTypeBreeds from './pages/Admin/PetTypeBreeds';
 import Admins from './pages/Admin/Admins';
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
             <Route path="users" element={<Users />} />
             <Route path="pets" element={<Pets />} />
             <Route path="pet-types" element={<PetTypes />} />
+            <Route path="pet-type-breeds" element={<PetTypeBreeds />} />
             <Route path="admins" element={<Admins />} />
             <Route path="account" element={<div>Account Settings</div>} />
             <Route path="settings" element={<div>Settings</div>} />

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import adminAdminsService from '../../services/adminAdminsService';
 import DataTable from '../../components/common/DataTable/DataTable';
 import Button from '../../components/common/Button/Button';
@@ -29,6 +29,7 @@ const Admins = () => {
   });
   const [formErrors, setFormErrors] = useState({});
   const [submitLoading, setSubmitLoading] = useState(false);
+  const searchTimerRef = useRef(null);
 
   // Fetch admins
   const fetchAdmins = async (page = 1, search = '') => {
@@ -50,11 +51,14 @@ const Admins = () => {
     fetchAdmins(1, searchTerm);
   }, []);
 
-  // Handle search
+  // Handle search with debounce
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
-    fetchAdmins(1, value);
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    searchTimerRef.current = setTimeout(() => {
+      fetchAdmins(1, value);
+    }, 600);
   };
 
   // Handle page change
@@ -232,6 +236,7 @@ const Admins = () => {
             value={searchTerm}
             onChange={handleSearch}
             className={styles.searchInput}
+            disabled={loading}
           />
         </div>
       </div>

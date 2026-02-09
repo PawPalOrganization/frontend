@@ -1,55 +1,67 @@
 import { useState, useEffect, useRef } from 'react';
+import adminPetTypeBreedsService from '../../services/adminPetTypeBreedsService';
 import adminPetTypesService from '../../services/adminPetTypesService';
 import DataTable from '../../components/common/DataTable/DataTable';
 import Button from '../../components/common/Button/Button';
 import Modal from '../../components/common/Modal/Modal';
 import Input from '../../components/common/Input/Input';
 import TablePageSkeleton from '../../components/common/Skeleton/TablePageSkeleton';
-import styles from './PetTypes.module.scss';
+import styles from './PetTypeBreeds.module.scss';
 
-const PetTypes = () => {
-  const [petTypes, setPetTypes] = useState([]);
+const PetTypeBreeds = () => {
+  const [breeds, setBreeds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterPetTypeId, setFilterPetTypeId] = useState('');
+
+  // Pet types for filter & form dropdown
+  const [petTypes, setPetTypes] = useState([]);
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedPetType, setSelectedPetType] = useState(null);
+  const [selectedBreed, setSelectedBreed] = useState(null);
 
   // Form state
-  const [formData, setFormData] = useState({
-    name: '',
-    imageUrl: '',
-  });
+  const [formData, setFormData] = useState({ name: '', petTypeId: '' });
   const [formErrors, setFormErrors] = useState({});
   const [submitLoading, setSubmitLoading] = useState(false);
   const [deleteError, setDeleteError] = useState('');
   const searchTimerRef = useRef(null);
 
-  // Fetch pet types
-  const fetchPetTypes = async (page = 1, search = '') => {
+  // Fetch breeds
+  const fetchBreeds = async (page = 1, petTypeId = '', search = '') => {
     setLoading(true);
     try {
-      const response = await adminPetTypesService.getAllPetTypes(page, 10, search);
-      setPetTypes(response.data || []);
+      const response = await adminPetTypeBreedsService.getAllPetTypeBreeds(page, 10, petTypeId, search);
+      setBreeds(response.data || []);
       setTotalPages(response.meta?.totalPages || 1);
       setTotalItems(response.meta?.total || 0);
       setCurrentPage(page);
     } catch (error) {
-      console.error(error);
-      // Error fetching pet types
+      // Error fetching breeds
     } finally {
       setLoading(false);
     }
   };
 
+  // Fetch pet types for dropdowns
+  const fetchPetTypes = async () => {
+    try {
+      const response = await adminPetTypesService.getAllPetTypes(1, 100);
+      setPetTypes(response.data || []);
+    } catch (error) {
+      // Error fetching pet types
+    }
+  };
+
   useEffect(() => {
-    fetchPetTypes(1, searchTerm);
+    fetchBreeds(1, filterPetTypeId, searchTerm);
+    fetchPetTypes();
   }, []);
 
   // Handle search with debounce
@@ -58,39 +70,43 @@ const PetTypes = () => {
     setSearchTerm(value);
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
     searchTimerRef.current = setTimeout(() => {
-      fetchPetTypes(1, value);
+      fetchBreeds(1, filterPetTypeId, value);
     }, 600);
+  };
+
+  // Handle pet type filter
+  const handleFilterChange = (e) => {
+    const value = e.target.value;
+    setFilterPetTypeId(value);
+    fetchBreeds(1, value, searchTerm);
   };
 
   // Handle page change
   const handlePageChange = (page) => {
-    fetchPetTypes(page, searchTerm);
+    fetchBreeds(page, filterPetTypeId, searchTerm);
   };
 
   // Open create modal
   const handleCreate = () => {
-    setFormData({
-      name: '',
-      imageUrl: '',
-    });
+    setFormData({ name: '', petTypeId: '' });
     setFormErrors({});
     setIsCreateModalOpen(true);
   };
 
   // Open edit modal
-  const handleEdit = (petType) => {
-    setSelectedPetType(petType);
+  const handleEdit = (breed) => {
+    setSelectedBreed(breed);
     setFormData({
-      name: petType.name || '',
-      imageUrl: petType.imageUrl || '',
+      name: breed.name || '',
+      petTypeId: breed.petTypeId || '',
     });
     setFormErrors({});
     setIsEditModalOpen(true);
   };
 
   // Open delete modal
-  const handleDeleteClick = (petType) => {
-    setSelectedPetType(petType);
+  const handleDeleteClick = (breed) => {
+    setSelectedBreed(breed);
     setDeleteError('');
     setIsDeleteModalOpen(true);
   };
@@ -98,11 +114,12 @@ const PetTypes = () => {
   // Validate form
   const validateForm = () => {
     const errors = {};
-
     if (!formData.name.trim()) {
-      errors.name = 'Pet type name is required';
+      errors.name = 'Breed name is required';
     }
-
+    if (!formData.petTypeId) {
+      errors.petTypeId = 'Pet type is required';
+    }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -122,12 +139,15 @@ const PetTypes = () => {
 
     setSubmitLoading(true);
     try {
-      await adminPetTypesService.createPetType(formData);
+      await adminPetTypeBreedsService.createPetTypeBreed({
+        name: formData.name,
+        petTypeId: parseInt(formData.petTypeId, 10),
+      });
       setIsCreateModalOpen(false);
-      fetchPetTypes(currentPage, searchTerm);
+      fetchBreeds(currentPage, filterPetTypeId, searchTerm);
     } catch (error) {
       setFormErrors({
-        form: error.response?.data?.message || 'Failed to create pet type',
+        form: error.response?.data?.message || 'Failed to create breed',
       });
     } finally {
       setSubmitLoading(false);
@@ -140,12 +160,15 @@ const PetTypes = () => {
 
     setSubmitLoading(true);
     try {
-      await adminPetTypesService.updatePetType(selectedPetType.id, formData);
+      await adminPetTypeBreedsService.updatePetTypeBreed(selectedBreed.id, {
+        name: formData.name,
+        petTypeId: parseInt(formData.petTypeId, 10),
+      });
       setIsEditModalOpen(false);
-      fetchPetTypes(currentPage, searchTerm);
+      fetchBreeds(currentPage, filterPetTypeId, searchTerm);
     } catch (error) {
       setFormErrors({
-        form: error.response?.data?.message || 'Failed to update pet type',
+        form: error.response?.data?.message || 'Failed to update breed',
       });
     } finally {
       setSubmitLoading(false);
@@ -157,45 +180,79 @@ const PetTypes = () => {
     setSubmitLoading(true);
     setDeleteError('');
     try {
-      await adminPetTypesService.deletePetType(selectedPetType.id);
+      await adminPetTypeBreedsService.deletePetTypeBreed(selectedBreed.id);
       setIsDeleteModalOpen(false);
-      fetchPetTypes(currentPage, searchTerm);
+      fetchBreeds(currentPage, filterPetTypeId, searchTerm);
     } catch (error) {
       const status = error.response?.status;
       const message = error.response?.data?.message;
       if (status === 409) {
-        setDeleteError(message || 'Cannot delete this pet type because it has related records (pets or breeds). Remove them first.');
+        setDeleteError(message || 'Cannot delete this breed because it has related pets. Remove them first.');
       } else {
-        setDeleteError(message || 'Failed to delete pet type.');
+        setDeleteError(message || 'Failed to delete breed.');
       }
     } finally {
       setSubmitLoading(false);
     }
   };
 
+  // Reusable form fields
+  const renderFormFields = () => (
+    <div className={styles.form}>
+      {formErrors.form && (
+        <div className="alert alert-danger">{formErrors.form}</div>
+      )}
+
+      <Input
+        label="Breed Name"
+        name="name"
+        value={formData.name}
+        onChange={handleInputChange}
+        error={formErrors.name}
+        placeholder="e.g., Golden Retriever, Persian"
+        required
+      />
+
+      <div>
+        <label className={styles.label}>
+          Pet Type <span style={{ color: '#E74C3C' }}>*</span>
+        </label>
+        <select
+          name="petTypeId"
+          value={formData.petTypeId}
+          onChange={handleInputChange}
+          className={`${styles.select} ${formErrors.petTypeId ? styles.selectError : ''}`}
+        >
+          <option value="">Select Pet Type</option>
+          {petTypes.map((type) => (
+            <option key={type.id} value={type.id}>
+              {type.name}
+            </option>
+          ))}
+        </select>
+        {formErrors.petTypeId && (
+          <span className={styles.errorText}>{formErrors.petTypeId}</span>
+        )}
+      </div>
+    </div>
+  );
+
   // Table columns
   const columns = [
     {
-      key: 'imageUrl',
-      label: 'Image',
-      width: '15%',
-      render: (row) =>
-        row.imageUrl ? (
-          <img
-            src={row.imageUrl}
-            alt={row.name}
-            className={styles.typeImage}
-          />
-        ) : (
-          <div className={styles.noImage}>
-            <i className="bi bi-image"></i>
-          </div>
-        ),
+      key: 'name',
+      label: 'Breed Name',
+      width: '35%',
     },
     {
-      key: 'name',
-      label: 'Type Name',
-      width: '35%',
+      key: 'petType',
+      label: 'Pet Type',
+      width: '25%',
+      render: (row) => (
+        <span className={styles.badge}>
+          {row.petType?.name || 'N/A'}
+        </span>
+      ),
     },
     {
       key: 'createdAt',
@@ -206,46 +263,61 @@ const PetTypes = () => {
   ];
 
   // Show full-page skeleton on initial load
-  if (loading && petTypes.length === 0) {
+  if (loading && breeds.length === 0) {
     return <TablePageSkeleton columns={3} rows={8} />;
   }
 
   return (
-    <div className={styles.petTypesPage}>
+    <div className={styles.petTypeBreedsPage}>
       {/* Page Header */}
       <div className={styles.header}>
         <div>
-          <h1 className={styles.title}>Pet Types Management</h1>
-          <p className={styles.subtitle}>Manage available pet types</p>
+          <h1 className={styles.title}>Pet Breeds Management</h1>
+          <p className={styles.subtitle}>Manage breeds for each pet type</p>
         </div>
         <Button
           variant="primary"
           icon="bi-plus-lg"
           onClick={handleCreate}
         >
-          Add Pet Type
+          Add Breed
         </Button>
       </div>
 
-      {/* Search Bar */}
+      {/* Search & Filter Bar */}
       <div className={styles.searchBar}>
-        <div className={styles.searchWrapper}>
-          <i className="bi bi-search"></i>
-          <input
-            type="text"
-            placeholder="Search pet types..."
-            value={searchTerm}
-            onChange={handleSearch}
-            className={styles.searchInput}
+        <div className={styles.filterRow}>
+          <div className={styles.searchWrapper}>
+            <i className="bi bi-search"></i>
+            <input
+              type="text"
+              placeholder="Search breeds..."
+              value={searchTerm}
+              onChange={handleSearch}
+              className={styles.searchInput}
+              disabled={loading}
+            />
+          </div>
+          <select
+            value={filterPetTypeId}
+            onChange={handleFilterChange}
+            className={styles.filterSelect}
             disabled={loading}
-          />
+          >
+            <option value="">All Pet Types</option>
+            {petTypes.map((type) => (
+              <option key={type.id} value={type.id}>
+                {type.name}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
       {/* Data Table */}
       <DataTable
         columns={columns}
-        data={petTypes}
+        data={breeds}
         loading={loading}
         currentPage={currentPage}
         totalPages={totalPages}
@@ -253,14 +325,14 @@ const PetTypes = () => {
         onPageChange={handlePageChange}
         onEdit={handleEdit}
         onDelete={handleDeleteClick}
-        emptyMessage="No pet types found"
+        emptyMessage="No breeds found"
       />
 
       {/* Create Modal */}
       <Modal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        title="Create New Pet Type"
+        title="Create New Breed"
         size="medium"
         footer={
           <>
@@ -276,49 +348,19 @@ const PetTypes = () => {
               onClick={handleCreateSubmit}
               loading={submitLoading}
             >
-              Create Pet Type
+              Create Breed
             </Button>
           </>
         }
       >
-        <div className={styles.form}>
-          {formErrors.form && (
-            <div className="alert alert-danger">{formErrors.form}</div>
-          )}
-
-          <Input
-            label="Type Name"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            error={formErrors.name}
-            placeholder="e.g., Dog, Cat, Bird"
-            required
-          />
-
-          <Input
-            label="Image URL"
-            name="imageUrl"
-            value={formData.imageUrl}
-            onChange={handleInputChange}
-            error={formErrors.imageUrl}
-            placeholder="https://example.com/pet-types/dog.png"
-            icon="bi-image"
-          />
-
-          {formData.imageUrl && (
-            <div className={styles.imagePreview}>
-              <img src={formData.imageUrl} alt="Preview" />
-            </div>
-          )}
-        </div>
+        {renderFormFields()}
       </Modal>
 
       {/* Edit Modal */}
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        title="Edit Pet Type"
+        title="Edit Breed"
         size="medium"
         footer={
           <>
@@ -339,44 +381,14 @@ const PetTypes = () => {
           </>
         }
       >
-        <div className={styles.form}>
-          {formErrors.form && (
-            <div className="alert alert-danger">{formErrors.form}</div>
-          )}
-
-          <Input
-            label="Type Name"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            error={formErrors.name}
-            placeholder="e.g., Dog, Cat, Bird"
-            required
-          />
-
-          <Input
-            label="Image URL"
-            name="imageUrl"
-            value={formData.imageUrl}
-            onChange={handleInputChange}
-            error={formErrors.imageUrl}
-            placeholder="https://example.com/pet-types/dog.png"
-            icon="bi-image"
-          />
-
-          {formData.imageUrl && (
-            <div className={styles.imagePreview}>
-              <img src={formData.imageUrl} alt="Preview" />
-            </div>
-          )}
-        </div>
+        {renderFormFields()}
       </Modal>
 
       {/* Delete Confirmation Modal */}
       <Modal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
-        title="Delete Pet Type"
+        title="Delete Breed"
         size="small"
         footer={
           <>
@@ -402,11 +414,11 @@ const PetTypes = () => {
         )}
         <p>
           Are you sure you want to delete{' '}
-          <strong>{selectedPetType?.name}</strong>? This action cannot be undone.
+          <strong>{selectedBreed?.name}</strong>? This action cannot be undone.
         </p>
       </Modal>
     </div>
   );
 };
 
-export default PetTypes;
+export default PetTypeBreeds;

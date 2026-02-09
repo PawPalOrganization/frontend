@@ -1,10 +1,10 @@
-.petTypesPage {
+.petTypeBreedsPage {
   padding: 0;
   width: 100%;
   max-width: 100%;
   overflow-x: hidden;
 
-  @media (max-width: 991px) {
+  @media (max-width: 768px) {
     padding: 0;
   }
 }
@@ -17,7 +17,7 @@
   gap: 16px;
   flex-wrap: wrap;
 
-  @media (max-width: 991px) {
+  @media (max-width: 768px) {
     flex-direction: column;
     align-items: flex-start;
     margin-bottom: 20px;
@@ -30,7 +30,7 @@
   color: #2C3E50;
   margin: 0;
 
-  @media (max-width: 991px) {
+  @media (max-width: 768px) {
     font-size: 22px;
   }
 }
@@ -40,7 +40,7 @@
   color: #7F8C8D;
   margin: 4px 0 0 0;
 
-  @media (max-width: 991px) {
+  @media (max-width: 768px) {
     font-size: 13px;
   }
 }
@@ -48,16 +48,28 @@
 .searchBar {
   margin-bottom: 24px;
 
-  @media (max-width: 991px) {
+  @media (max-width: 768px) {
     margin-bottom: 16px;
+  }
+}
+
+.filterRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
 
 .searchWrapper {
   position: relative;
   max-width: 400px;
+  flex: 1;
 
-  @media (max-width: 991px) {
+  @media (max-width: 768px) {
     max-width: 100%;
   }
 
@@ -96,6 +108,45 @@
   }
 }
 
+.filterSelect {
+  padding: 12px 14px;
+  border: 1px solid #DEE2E6;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #2C3E50;
+  background: white;
+  cursor: pointer;
+  min-width: 180px;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #0D9AFF;
+    box-shadow: 0 0 0 3px rgba(13, 154, 255, 0.1);
+  }
+
+  &:disabled {
+    background: #F8F9FA;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  @media (max-width: 768px) {
+    min-width: unset;
+  }
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+  background: #E3F2FD;
+  color: #0D9AFF;
+}
+
 .form {
   display: flex;
   flex-direction: column;
@@ -110,38 +161,31 @@
   margin-bottom: 8px;
 }
 
-.typeImage {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  object-fit: cover;
-  border: 1px solid #DEE2E6;
-}
-
-.noImage {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  border: 1px solid #DEE2E6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #F8F9FA;
-  color: #ADB5BD;
-  font-size: 18px;
-}
-
-.imagePreview {
+.select {
+  width: 100%;
+  padding: 10px 14px;
   border: 1px solid #DEE2E6;
   border-radius: 8px;
-  padding: 8px;
-  text-align: center;
-  background: #F8F9FA;
+  font-size: 14px;
+  color: #2C3E50;
+  background: white;
+  transition: all 0.2s ease;
+  cursor: pointer;
 
-  img {
-    max-width: 100%;
-    max-height: 120px;
-    border-radius: 6px;
-    object-fit: contain;
+  &:focus {
+    outline: none;
+    border-color: #0D9AFF;
+    box-shadow: 0 0 0 3px rgba(13, 154, 255, 0.1);
   }
+
+  &.selectError {
+    border-color: #E74C3C;
+  }
+}
+
+.errorText {
+  display: block;
+  font-size: 12px;
+  color: #E74C3C;
+  margin-top: 4px;
 }
