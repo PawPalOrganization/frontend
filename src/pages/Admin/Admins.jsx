@@ -204,8 +204,8 @@ const Admins = () => {
     },
   ];
 
-  // Show full-page skeleton on initial load
-  if (loading && admins.length === 0) {
+  // Show skeleton while loading
+  if (loading) {
     return <TablePageSkeleton columns={3} rows={8} />;
   }
 

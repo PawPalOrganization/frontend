@@ -248,8 +248,8 @@ const Users = () => {
     },
   ];
 
-  // Show full-page skeleton on initial load
-  if (loading && users.length === 0) {
+  // Show skeleton while loading
+  if (loading) {
     return <TablePageSkeleton columns={6} rows={8} />;
   }
 

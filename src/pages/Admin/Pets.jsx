@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import adminPetsService from '../../services/adminPetsService';
+import adminFilesService from '../../services/adminFilesService';
 import adminUsersService from '../../services/adminUsersService';
 import adminPetTypesService from '../../services/adminPetTypesService';
 import adminPetTypeBreedsService from '../../services/adminPetTypeBreedsService';
@@ -47,7 +48,9 @@ const Pets = () => {
   const [formErrors, setFormErrors] = useState({});
   const [submitLoading, setSubmitLoading] = useState(false);
   const [deleteError, setDeleteError] = useState('');
+  const [uploadLoading, setUploadLoading] = useState(false);
   const searchTimerRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   // Fetch pets
   const fetchPets = async (page = 1, search = '') => {
@@ -213,6 +216,24 @@ const Pets = () => {
     if (name === 'petTypeId') {
       setFormData((prev) => ({ ...prev, petTypeId: value, petTypeBreedId: '' }));
       fetchBreeds(value);
+    }
+  };
+
+  // Handle file upload
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadLoading(true);
+    try {
+      const response = await adminFilesService.uploadFile(file);
+      const url = response.data?.signedUrl || response.data?.publicUrl || response.data?.url || '';
+      setFormData((prev) => ({ ...prev, imageUrl: url }));
+    } catch {
+      setFormErrors((prev) => ({ ...prev, imageUrl: 'Failed to upload image' }));
+    } finally {
+      setUploadLoading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -483,16 +504,41 @@ const Pets = () => {
         placeholder="Any notes about the pet..."
       />
 
-      <Input
-        label="Image URL"
-        name="imageUrl"
-        value={formData.imageUrl}
-        onChange={handleInputChange}
-        placeholder="https://example.com/pets/photo.jpg"
-        icon="bi-image"
-      />
+      <div>
+        <label className={styles.label}>Image</label>
+        <div className={styles.uploadRow}>
+          <button
+            type="button"
+            className={styles.uploadButton}
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploadLoading}
+          >
+            <i className={`bi ${uploadLoading ? 'bi-arrow-repeat' : 'bi-upload'}`}></i>
+            {uploadLoading ? 'Uploading...' : 'Upload'}
+          </button>
+          <span className={styles.orText}>or</span>
+          <input
+            type="text"
+            name="imageUrl"
+            value={formData.imageUrl}
+            onChange={handleInputChange}
+            placeholder="Paste image URL"
+            className={styles.urlInput}
+          />
+        </div>
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileUpload}
+          accept="image/*"
+          style={{ display: 'none' }}
+        />
+        {formErrors.imageUrl && (
+          <span className={styles.errorText}>{formErrors.imageUrl}</span>
+        )}
+      </div>
 
-      {formData.imageUrl && formData.imageUrl.startsWith('http') && (
+      {formData.imageUrl?.startsWith('http') && (
         <div className={styles.imagePreview}>
           <img src={formData.imageUrl} alt="Preview" />
         </div>
@@ -506,16 +552,14 @@ const Pets = () => {
       key: 'imageUrl',
       label: '',
       width: '60px',
-      render: (row) => {
-        const isValidUrl = row.imageUrl && row.imageUrl.startsWith('http');
-        return isValidUrl ? (
+      render: (row) =>
+        row.imageUrl?.startsWith('http') ? (
           <img src={row.imageUrl} alt={row.name} className={styles.petImage} />
         ) : (
           <div className={styles.noImage}>
             <i className="bi bi-image"></i>
           </div>
-        );
-      },
+        ),
     },
     {
       key: 'name',
@@ -576,8 +620,8 @@ const Pets = () => {
     },
   ];
 
-  // Show full-page skeleton on initial load
-  if (loading && pets.length === 0) {
+  // Show skeleton while loading
+  if (loading) {
     return <TablePageSkeleton columns={8} rows={8} />;
   }
 

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import adminPetTypesService from '../../services/adminPetTypesService';
+import adminFilesService from '../../services/adminFilesService';
 import DataTable from '../../components/common/DataTable/DataTable';
 import Button from '../../components/common/Button/Button';
 import Modal from '../../components/common/Modal/Modal';
@@ -29,7 +30,9 @@ const PetTypes = () => {
   const [formErrors, setFormErrors] = useState({});
   const [submitLoading, setSubmitLoading] = useState(false);
   const [deleteError, setDeleteError] = useState('');
+  const [uploadLoading, setUploadLoading] = useState(false);
   const searchTimerRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   // Fetch pet types
   const fetchPetTypes = async (page = 1, search = '') => {
@@ -116,6 +119,24 @@ const PetTypes = () => {
     }
   };
 
+  // Handle file upload
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadLoading(true);
+    try {
+      const response = await adminFilesService.uploadFile(file);
+      const url = response.data?.signedUrl || response.data?.publicUrl || response.data?.url || '';
+      setFormData((prev) => ({ ...prev, imageUrl: url }));
+    } catch {
+      setFormErrors((prev) => ({ ...prev, imageUrl: 'Failed to upload image' }));
+    } finally {
+      setUploadLoading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   // Submit create
   const handleCreateSubmit = async () => {
     if (!validateForm()) return;
@@ -180,7 +201,7 @@ const PetTypes = () => {
       label: 'Image',
       width: '15%',
       render: (row) =>
-        row.imageUrl ? (
+        row.imageUrl?.startsWith('http') ? (
           <img
             src={row.imageUrl}
             alt={row.name}
@@ -205,8 +226,8 @@ const PetTypes = () => {
     },
   ];
 
-  // Show full-page skeleton on initial load
-  if (loading && petTypes.length === 0) {
+  // Show skeleton while loading
+  if (loading) {
     return <TablePageSkeleton columns={3} rows={8} />;
   }
 
@@ -296,17 +317,41 @@ const PetTypes = () => {
             required
           />
 
-          <Input
-            label="Image URL"
-            name="imageUrl"
-            value={formData.imageUrl}
-            onChange={handleInputChange}
-            error={formErrors.imageUrl}
-            placeholder="https://example.com/pet-types/dog.png"
-            icon="bi-image"
-          />
+          <div>
+            <label className={styles.label}>Image</label>
+            <div className={styles.uploadRow}>
+              <button
+                type="button"
+                className={styles.uploadButton}
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadLoading}
+              >
+                <i className={`bi ${uploadLoading ? 'bi-arrow-repeat' : 'bi-upload'}`}></i>
+                {uploadLoading ? 'Uploading...' : 'Upload'}
+              </button>
+              <span className={styles.orText}>or</span>
+              <input
+                type="text"
+                name="imageUrl"
+                value={formData.imageUrl}
+                onChange={handleInputChange}
+                placeholder="Paste image URL"
+                className={styles.urlInput}
+              />
+            </div>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              accept="image/*"
+              style={{ display: 'none' }}
+            />
+            {formErrors.imageUrl && (
+              <span className={styles.errorText}>{formErrors.imageUrl}</span>
+            )}
+          </div>
 
-          {formData.imageUrl && (
+          {formData.imageUrl?.startsWith('http') && (
             <div className={styles.imagePreview}>
               <img src={formData.imageUrl} alt="Preview" />
             </div>
@@ -354,17 +399,41 @@ const PetTypes = () => {
             required
           />
 
-          <Input
-            label="Image URL"
-            name="imageUrl"
-            value={formData.imageUrl}
-            onChange={handleInputChange}
-            error={formErrors.imageUrl}
-            placeholder="https://example.com/pet-types/dog.png"
-            icon="bi-image"
-          />
+          <div>
+            <label className={styles.label}>Image</label>
+            <div className={styles.uploadRow}>
+              <button
+                type="button"
+                className={styles.uploadButton}
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadLoading}
+              >
+                <i className={`bi ${uploadLoading ? 'bi-arrow-repeat' : 'bi-upload'}`}></i>
+                {uploadLoading ? 'Uploading...' : 'Upload'}
+              </button>
+              <span className={styles.orText}>or</span>
+              <input
+                type="text"
+                name="imageUrl"
+                value={formData.imageUrl}
+                onChange={handleInputChange}
+                placeholder="Paste image URL"
+                className={styles.urlInput}
+              />
+            </div>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              accept="image/*"
+              style={{ display: 'none' }}
+            />
+            {formErrors.imageUrl && (
+              <span className={styles.errorText}>{formErrors.imageUrl}</span>
+            )}
+          </div>
 
-          {formData.imageUrl && (
+          {formData.imageUrl?.startsWith('http') && (
             <div className={styles.imagePreview}>
               <img src={formData.imageUrl} alt="Preview" />
             </div>

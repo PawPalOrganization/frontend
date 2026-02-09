@@ -263,7 +263,7 @@ const PetTypeBreeds = () => {
   ];
 
   // Show full-page skeleton on initial load
-  if (loading && breeds.length === 0) {
+  if (loading) {
     return <TablePageSkeleton columns={3} rows={8} />;
   }
 

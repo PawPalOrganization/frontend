@@ -129,9 +129,32 @@ src/
 ### Overview
 Admin web dashboard for managing users, pets, and system configuration. Built separately from mobile app with different authentication.
 
-**Status:** Core foundation complete with working authentication, layout, and live dashboard statistics. All Phase 1 management pages complete (Users, Pets, Pet Types, Admins) with full CRUD operations. Responsive design implemented for mobile/tablet support.
+**Status:** Core foundation complete with working authentication, layout, and live dashboard statistics. All management pages complete (Users, Pets, Pet Types, Pet Breeds, Admins) with full CRUD operations. Responsive design, debounced search, file upload, and skeleton loading implemented.
 
-**Last Updated:** February 1, 2026
+**Last Updated:** February 9, 2026
+
+### ✨ Session Summary (Feb 9, 2026: Phase 2 Enhancements)
+
+**What We Built:**
+- ✅ Pet Type Breeds Management Page (full CRUD with pet type filter dropdown)
+- ✅ File Upload Service (`adminFilesService.js`) for image uploads
+- ✅ Dual image upload (file button + URL paste) on PetTypes and Pets pages
+- ✅ Debounced search (600ms) across all 5 management pages using `useRef`
+- ✅ Controls disabled during loading (search inputs + filter selects)
+- ✅ Skeleton loading on every fetch (not just initial load)
+- ✅ Image display with `startsWith('http')` guard for Expo `file:///` paths
+- ✅ Upload uses `signedUrl` (private bucket, `publicUrl` not accessible)
+- ✅ Cascading petType → breed dropdowns in Pets form
+- ✅ Weight "kg" auto-append and normalization
+- ✅ Adoption date cannot be before birthdate validation
+- ✅ 409 conflict error handling on all delete operations
+- ✅ `parseInt()` for HTML select values before sending to API
+
+**Key Technical Decisions:**
+- `signedUrl` over `publicUrl` — S3 bucket is private, signed URLs expire in 1h
+- `useRef` for debounce timer — persists across re-renders without triggering them
+- `TablePageSkeleton` shown on every fetch — user always knows data is refreshing
+- `imageUrl?.startsWith('http')` — existing mobile data has `file:///` Expo paths
 
 ### ✨ Session Summary (Feb 1, 2026: Phase 1 Complete)
 
@@ -224,6 +247,8 @@ src/
 │   ├── adminUsersService.js    # Users CRUD operations
 │   ├── adminPetsService.js     # Pets CRUD operations
 │   ├── adminPetTypesService.js # Pet Types CRUD
+│   ├── adminPetTypeBreedsService.js # Pet Type Breeds CRUD
+│   ├── adminFilesService.js   # File upload (multipart/form-data)
 │   └── adminAdminsService.js   # Admins management
 │
 ├── context/                     # ✅ COMPLETE - Admin Auth
@@ -240,9 +265,16 @@ src/
 │   │   ├── Modal/
 │   │   │   ├── Modal.jsx       # Dialog modal (small, medium, large)
 │   │   │   └── Modal.css
-│   │   └── DataTable/           # ✅ NEW - Reusable Data Table
-│   │       ├── DataTable.jsx    # Table with pagination, search, actions
-│   │       └── DataTable.module.scss
+│   │   ├── DataTable/           # ✅ Reusable Data Table
+│   │   │   ├── DataTable.jsx    # Table with pagination, search, actions
+│   │   │   └── DataTable.module.scss
+│   │   └── Skeleton/            # ✅ Skeleton Loading Components
+│   │       ├── Skeleton.jsx     # Base shimmer component
+│   │       ├── Skeleton.module.scss
+│   │       ├── TablePageSkeleton.jsx   # Full page skeleton
+│   │       ├── TablePageSkeleton.module.scss
+│   │       ├── PageHeaderSkeleton.jsx
+│   │       └── PageHeaderSkeleton.module.scss
 │   │
 │   └── layout/                  # ✅ COMPLETE - Admin Layout
 │       ├── AdminSidebar/
@@ -264,8 +296,10 @@ src/
         ├── Users.module.scss
         ├── Pets.jsx            # ✅ Pets management (full CRUD)
         ├── Pets.module.scss
-        ├── PetTypes.jsx        # ✅ Pet Types management (full CRUD)
+        ├── PetTypes.jsx        # ✅ Pet Types management (full CRUD + image upload)
         ├── PetTypes.module.scss
+        ├── PetTypeBreeds.jsx   # ✅ Pet Breeds management (full CRUD + type filter)
+        ├── PetTypeBreeds.module.scss
         ├── Admins.jsx          # ✅ Admins management (full CRUD)
         └── Admins.module.scss
 ```
@@ -279,6 +313,7 @@ src/
   ├── /users                   // ✅ Users management (COMPLETE)
   ├── /pets                    // ✅ Pets management (COMPLETE)
   ├── /pet-types               // ✅ Pet Types management (COMPLETE)
+  ├── /pet-type-breeds         // ✅ Pet Breeds management (COMPLETE)
   ├── /admins                  // ✅ Admins management (COMPLETE)
   ├── /account                 // ⏳ TODO: Account settings
   └── /settings                // ⏳ TODO: System settings
@@ -304,19 +339,25 @@ src/
   - Delete users with confirmation modal
   - Fields: First Name, Last Name, Email, Phone, Password, Birth Date, Gender
 - **Pets Management** - Full CRUD operations:
-  - List pets with owner information
-  - Search pets by name or breed
-  - Create new pets with owner/type selection
-  - Edit existing pets
-  - Delete pets with confirmation modal
-  - Fields: Pet Name, Owner (dropdown), Pet Type (dropdown), Breed, Birth Date, Gender, Size, Weight
+  - List pets with owner, type, breed, gender, size, weight columns
+  - Search pets by name or breed (debounced 600ms)
+  - Cascading dropdowns: Pet Type → Breed (reloads breeds on type change)
+  - Dual image upload (file + URL paste) with `signedUrl`
+  - Weight auto-appends "kg", adoption date validates against birthdate
+  - Delete with 409 conflict handling
+  - Fields: Pet Name, Owner, Pet Type, Breed, Birthdate, Gender, Size, Weight, Age, Notes, Image, Adoption Date
 - **Pet Types Management** - Full CRUD operations:
   - List all pet types with pagination
-  - Search pet types by name
-  - Create new pet types
-  - Edit existing pet types
-  - Delete pet types with confirmation modal
-  - Fields: Type Name (required), Description (optional textarea)
+  - Search pet types by name (debounced 600ms)
+  - Create/edit with dual image upload (file + URL paste)
+  - Delete with 409 conflict handling
+  - Fields: Type Name (required), Image (upload or URL)
+- **Pet Breeds Management** - Full CRUD operations:
+  - List breeds with pet type filter dropdown
+  - Search breeds by name (debounced 600ms)
+  - Create/edit with pet type selection
+  - Delete with 409 conflict handling
+  - Fields: Breed Name (required), Pet Type (required dropdown)
 - **Admins Management** - Full CRUD operations:
   - List all admin accounts with pagination
   - Search admins by name or email
@@ -374,6 +415,19 @@ src/
 - `POST /admin/api/pet-types` - Create pet type
 - `PUT /admin/api/pet-types/:id` - Update pet type
 - `DELETE /admin/api/pet-types/:id` - Delete pet type
+
+**Pet Type Breeds Management:**
+- `GET /admin/api/pet-type-breeds` - List breeds (pagination, search, petTypeId filter)
+- `GET /admin/api/pet-type-breeds/:id` - Get breed
+- `POST /admin/api/pet-type-breeds` - Create breed
+- `PUT /admin/api/pet-type-breeds/:id` - Update breed
+- `DELETE /admin/api/pet-type-breeds/:id` - Delete breed
+
+**File Management:**
+- `POST /admin/api/files/upload` - Upload file (multipart/form-data)
+  - Returns: `{ success, message, data: { bucket, key, signedUrl, publicUrl } }`
+  - `signedUrl` has auth tokens (expires 1h) — use this for display
+  - `publicUrl` is NOT publicly accessible (private bucket)
 
 **Admins Management:**
 - `GET /admin/api/admins` - List admins
@@ -452,21 +506,24 @@ src/
 - [x] Users Management Page (list, create, edit, delete) ✅
 - [x] Pets Management Page (list, create, edit, delete) ✅
 - [x] Pet Types Management Page (list, create, edit, delete) ✅
+- [x] Pet Type Breeds Management Page (list, create, edit, delete + filter) ✅
 - [x] Admins Management Page (list, create, edit, delete) ✅
 
-#### Phase 2: Additional Components
+#### Phase 2: UX Enhancements ✅ COMPLETE
 - [x] DataTable component (pagination, sorting, search) ✅
-- [ ] SearchBar component (integrated in management pages)
-- [ ] DeleteConfirmation modal (integrated in management pages)
-- [ ] StatCard component for dashboard
+- [x] Debounced search (600ms) across all pages ✅
+- [x] Controls disabled during loading ✅
+- [x] Skeleton loading on every fetch ✅
+- [x] File upload service (dual: file + URL paste) ✅
+- [x] Image upload on PetTypes and Pets ✅
+- [x] 409 conflict error handling on delete ✅
+- [x] Form validation (required fields, adoption date vs birthdate) ✅
+- [x] Dashboard statistics with real data ✅
 
 #### Phase 3: Features
 - [ ] Protected routes (redirect if not authenticated)
-- [ ] Form validation
 - [ ] Toast notifications
-- [ ] Loading states
 - [ ] Error handling UI
-- [x] Dashboard statistics with real data ✅
 
 #### Phase 4: Polish
 - [x] Responsive design (mobile sidebar) ✅
