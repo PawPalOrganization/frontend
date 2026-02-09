@@ -248,11 +248,6 @@ const Users = () => {
     },
   ];
 
-  // Show skeleton while loading
-  if (loading) {
-    return <TablePageSkeleton columns={6} rows={8} />;
-  }
-
   return (
     <div className={styles.usersPage}>
       {/* Page Header */}
@@ -286,18 +281,22 @@ const Users = () => {
       </div>
 
       {/* Data Table */}
-      <DataTable
-        columns={columns}
-        data={users}
-        loading={loading}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={totalItems}
-        onPageChange={handlePageChange}
-        onEdit={handleEdit}
-        onDelete={handleDeleteClick}
-        emptyMessage="No users found"
-      />
+      {loading ? (
+        <TablePageSkeleton columns={6} rows={8} />
+      ) : (
+        <DataTable
+          columns={columns}
+          data={users}
+          loading={loading}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          onPageChange={handlePageChange}
+          onEdit={handleEdit}
+          onDelete={handleDeleteClick}
+          emptyMessage="No users found"
+        />
+      )}
 
       {/* Create Modal */}
       <Modal

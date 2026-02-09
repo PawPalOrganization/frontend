@@ -204,11 +204,6 @@ const Admins = () => {
     },
   ];
 
-  // Show skeleton while loading
-  if (loading) {
-    return <TablePageSkeleton columns={3} rows={8} />;
-  }
-
   return (
     <div className={styles.adminsPage}>
       {/* Page Header */}
@@ -242,18 +237,22 @@ const Admins = () => {
       </div>
 
       {/* Data Table */}
-      <DataTable
-        columns={columns}
-        data={admins}
-        loading={loading}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={totalItems}
-        onPageChange={handlePageChange}
-        onEdit={handleEdit}
-        onDelete={handleDeleteClick}
-        emptyMessage="No admins found"
-      />
+      {loading ? (
+        <TablePageSkeleton columns={3} rows={8} />
+      ) : (
+        <DataTable
+          columns={columns}
+          data={admins}
+          loading={loading}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          onPageChange={handlePageChange}
+          onEdit={handleEdit}
+          onDelete={handleDeleteClick}
+          emptyMessage="No admins found"
+        />
+      )}
 
       {/* Create Modal */}
       <Modal

@@ -3,23 +3,7 @@ import styles from './TablePageSkeleton.module.scss';
 
 const TablePageSkeleton = ({ columns = 6, rows = 8 }) => {
   return (
-    <div className={styles.container}>
-      {/* Page Header */}
-      <div className={styles.header}>
-        <div className={styles.headerLeft}>
-          <Skeleton width="240px" height="32px" className={styles.title} />
-          <Skeleton width="180px" height="16px" className={styles.subtitle} />
-        </div>
-        <Skeleton width="140px" height="44px" variant="rectangular" />
-      </div>
-
-      {/* Search Bar */}
-      <div className={styles.searchSection}>
-        <Skeleton width="100%" maxWidth="400px" height="48px" variant="rectangular" />
-      </div>
-
-      {/* Data Table */}
-      <div className={styles.tableCard}>
+    <div className={styles.tableCard}>
         {/* Table Header */}
         <div className={styles.tableHeader}>
           {Array.from({ length: columns }).map((_, i) => (
@@ -65,7 +49,6 @@ const TablePageSkeleton = ({ columns = 6, rows = 8 }) => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 

@@ -1,3 +1,4 @@
+import PawLoader from '../PawLoader/PawLoader';
 import styles from './Button.module.css';
 
 const Button = ({
@@ -30,11 +31,9 @@ const Button = ({
       disabled={disabled || loading}
       {...props}
     >
-      {loading && (
-        <span className={`spinner-border spinner-border-sm ${styles.spinner}`} />
-      )}
+      {loading && <PawLoader size="small" />}
       {!loading && icon && <i className={`bi ${icon} ${styles.icon}`}></i>}
-      {children}
+      {!loading && children}
     </button>
   );
 };

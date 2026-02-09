@@ -262,11 +262,6 @@ const PetTypeBreeds = () => {
     },
   ];
 
-  // Show full-page skeleton on initial load
-  if (loading) {
-    return <TablePageSkeleton columns={3} rows={8} />;
-  }
-
   return (
     <div className={styles.petTypeBreedsPage}>
       {/* Page Header */}
@@ -315,18 +310,22 @@ const PetTypeBreeds = () => {
       </div>
 
       {/* Data Table */}
-      <DataTable
-        columns={columns}
-        data={breeds}
-        loading={loading}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={totalItems}
-        onPageChange={handlePageChange}
-        onEdit={handleEdit}
-        onDelete={handleDeleteClick}
-        emptyMessage="No breeds found"
-      />
+      {loading ? (
+        <TablePageSkeleton columns={3} rows={8} />
+      ) : (
+        <DataTable
+          columns={columns}
+          data={breeds}
+          loading={loading}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          onPageChange={handlePageChange}
+          onEdit={handleEdit}
+          onDelete={handleDeleteClick}
+          emptyMessage="No breeds found"
+        />
+      )}
 
       {/* Create Modal */}
       <Modal

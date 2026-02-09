@@ -620,11 +620,6 @@ const Pets = () => {
     },
   ];
 
-  // Show skeleton while loading
-  if (loading) {
-    return <TablePageSkeleton columns={8} rows={8} />;
-  }
-
   return (
     <div className={styles.petsPage}>
       {/* Page Header */}
@@ -658,18 +653,22 @@ const Pets = () => {
       </div>
 
       {/* Data Table */}
-      <DataTable
-        columns={columns}
-        data={pets}
-        loading={loading}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={totalItems}
-        onPageChange={handlePageChange}
-        onEdit={handleEdit}
-        onDelete={handleDeleteClick}
-        emptyMessage="No pets found"
-      />
+      {loading ? (
+        <TablePageSkeleton columns={8} rows={8} />
+      ) : (
+        <DataTable
+          columns={columns}
+          data={pets}
+          loading={loading}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          onPageChange={handlePageChange}
+          onEdit={handleEdit}
+          onDelete={handleDeleteClick}
+          emptyMessage="No pets found"
+        />
+      )}
 
       {/* Create Modal */}
       <Modal

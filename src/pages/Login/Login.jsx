@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 import styles from './Login.module.scss';
+import PawLoader from '../../components/common/PawLoader/PawLoader';
 import logoPawBuddy from '../../assets/images/login/Logo Paw Buddy.png';
 import dogImage from '../../assets/images/login/dog.png';
 
@@ -203,10 +204,7 @@ const Login = () => {
                 disabled={loading}
               >
                 {loading ? (
-                  <>
-                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    Logging in...
-                  </>
+                  <PawLoader size="small" />
                 ) : (
                   'Log in'
                 )}
