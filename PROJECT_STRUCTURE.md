@@ -129,9 +129,28 @@ src/
 ### Overview
 Admin web dashboard for managing users, pets, and system configuration. Built separately from mobile app with different authentication.
 
-**Status:** Core foundation complete with working authentication, layout, and live dashboard statistics. All management pages complete (Users, Pets, Pet Types, Pet Breeds, Admins) with full CRUD operations. Responsive design, debounced search, file upload, and skeleton loading implemented.
+**Status:** Core foundation complete with working authentication, layout, and live dashboard statistics. All management pages complete (Users, Pets, Pet Types, Pet Breeds, Admins) with full CRUD operations. App Settings page with WYSIWYG editor for Terms & Conditions. Responsive design, debounced search, file upload, and skeleton loading implemented.
 
-**Last Updated:** February 9, 2026
+**Last Updated:** February 14, 2026
+
+### ✨ Session Summary (Feb 14, 2026: App Settings + Breed Images)
+
+**What We Built:**
+- ✅ App Settings Management Page (`/admin/app-settings`) — edit-only for predefined settings
+- ✅ WYSIWYG rich text editor (ReactQuill) for Terms & Conditions HTML content
+- ✅ Bulk update API pattern — `PUT /admin/api/app-settings` with array body `[{id, value}]`
+- ✅ Nested value handling — API stores values as `{value: "actual_value"}` objects
+- ✅ Image upload support added to Pet Breeds page (dual: file + URL paste)
+- ✅ PawLoader component used for upload loading states (replaces Bootstrap spinners)
+- ✅ Lazy loading for AppSettings page (`React.lazy()` + `Suspense`) to reduce main bundle size
+- ✅ New dependency: `react-quill-new` for React 19-compatible WYSIWYG editing
+
+**Key Technical Decisions:**
+- `react-quill-new` over `react-quill` — maintained fork with React 18+/19 support
+- Lazy-loaded AppSettings page — keeps ReactQuill (~100KB) out of main bundle
+- Conditional editor rendering — only `terms_and_conditions` token gets WYSIWYG, others get plain input
+- Bulk PUT endpoint — API updates settings as array `[{id, value: {value: "..."}}]`, no individual routes
+- `:global` in SCSS modules — required to style Quill's internal classes from CSS modules
 
 ### ✨ Session Summary (Feb 9, 2026: Phase 2 Enhancements)
 
@@ -249,7 +268,8 @@ src/
 │   ├── adminPetTypesService.js # Pet Types CRUD
 │   ├── adminPetTypeBreedsService.js # Pet Type Breeds CRUD
 │   ├── adminFilesService.js   # File upload (multipart/form-data)
-│   └── adminAdminsService.js   # Admins management
+│   ├── adminAdminsService.js   # Admins management
+│   └── adminAppSettingsService.js # App settings (bulk PUT)
 │
 ├── context/                     # ✅ COMPLETE - Admin Auth
 │   └── AdminAuthContext.jsx    # Admin authentication state
@@ -301,7 +321,9 @@ src/
         ├── PetTypeBreeds.jsx   # ✅ Pet Breeds management (full CRUD + type filter)
         ├── PetTypeBreeds.module.scss
         ├── Admins.jsx          # ✅ Admins management (full CRUD)
-        └── Admins.module.scss
+        ├── Admins.module.scss
+        ├── AppSettings.jsx     # ✅ App Settings (edit-only, ReactQuill WYSIWYG)
+        └── AppSettings.module.scss
 ```
 
 ### Admin Routes Structure
@@ -315,6 +337,7 @@ src/
   ├── /pet-types               // ✅ Pet Types management (COMPLETE)
   ├── /pet-type-breeds         // ✅ Pet Breeds management (COMPLETE)
   ├── /admins                  // ✅ Admins management (COMPLETE)
+  ├── /app-settings            // ✅ App Settings (edit-only, WYSIWYG for T&C)
   ├── /account                 // ⏳ TODO: Account settings
   └── /settings                // ⏳ TODO: System settings
 ```
@@ -355,9 +378,9 @@ src/
 - **Pet Breeds Management** - Full CRUD operations:
   - List breeds with pet type filter dropdown
   - Search breeds by name (debounced 600ms)
-  - Create/edit with pet type selection
+  - Create/edit with pet type selection + dual image upload (file + URL paste)
   - Delete with 409 conflict handling
-  - Fields: Breed Name (required), Pet Type (required dropdown)
+  - Fields: Breed Name (required), Pet Type (required dropdown), Image (upload or URL)
 - **Admins Management** - Full CRUD operations:
   - List all admin accounts with pagination
   - Search admins by name or email
@@ -365,6 +388,14 @@ src/
   - Edit existing admins
   - Delete admins with confirmation modal
   - Fields: Name, Email, Password (min 6 chars, optional on edit)
+- **App Settings Management** - Edit-only for predefined settings:
+  - List all app settings (Name, Value, Description, Created)
+  - Edit settings via modal (Name is read-only, Token is hidden)
+  - WYSIWYG rich text editor (ReactQuill) for Terms & Conditions
+  - Plain text input for other settings (App Name, Timezone Offset)
+  - Bulk update API: `PUT /app-settings` with `[{id, value: {value: "..."}}]`
+  - Lazy-loaded page (React.lazy + Suspense) to reduce main bundle
+  - Settings: App Name, App Time Zone Offset, Terms and Conditions
 
 **🔧 Important Technical Fixes:**
 1. **CORS Fixed** - Vite proxy configured for `/admin/api` endpoints
@@ -428,6 +459,12 @@ src/
   - Returns: `{ success, message, data: { bucket, key, signedUrl, publicUrl } }`
   - `signedUrl` has auth tokens (expires 1h) — use this for display
   - `publicUrl` is NOT publicly accessible (private bucket)
+
+**App Settings Management:**
+- `GET /admin/api/app-settings` - List all app settings (supports page, limit, search)
+- `PUT /admin/api/app-settings` - Bulk update settings (body: `[{id, value: {value: "..."}}]`)
+  - Response: `{ success, message, data: [...updated settings] }`
+  - Note: Uses nested `value.value` structure (JSON column storage)
 
 **Admins Management:**
 - `GET /admin/api/admins` - List admins
@@ -622,6 +659,7 @@ npm run dev
 - Bootstrap 5
 - React Router DOM
 - React Bootstrap
+- react-quill-new (WYSIWYG editor for rich text/HTML content)
 
 ## Getting Started
 

@@ -20,6 +20,7 @@ const AdminSidebar = ({ isOpen = false, onClose = () => {} }) => {
     { path: '/admin/pet-types', icon: 'bi-tag', label: 'Pet Types' },
     { path: '/admin/pet-type-breeds', icon: 'bi-tags', label: 'Breeds' },
     { path: '/admin/admins', icon: 'bi-shield', label: 'Admins' },
+    { path: '/admin/app-settings', icon: 'bi-sliders', label: 'App Settings' },
   ];
 
   const bottomNavItems = [
