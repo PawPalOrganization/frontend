@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import adminPetTypeBreedsService from '../../services/adminPetTypeBreedsService';
 import adminPetTypesService from '../../services/adminPetTypesService';
+import adminFilesService from '../../services/adminFilesService';
 import DataTable from '../../components/common/DataTable/DataTable';
 import Button from '../../components/common/Button/Button';
 import Modal from '../../components/common/Modal/Modal';
 import Input from '../../components/common/Input/Input';
 import TablePageSkeleton from '../../components/common/Skeleton/TablePageSkeleton';
+import PawLoader from '../../components/common/PawLoader/PawLoader';
 import styles from './PetTypeBreeds.module.scss';
 
 const PetTypeBreeds = () => {
@@ -27,11 +29,13 @@ const PetTypeBreeds = () => {
   const [selectedBreed, setSelectedBreed] = useState(null);
 
   // Form state
-  const [formData, setFormData] = useState({ name: '', petTypeId: '' });
+  const [formData, setFormData] = useState({ name: '', petTypeId: '', imageUrl: '' });
   const [formErrors, setFormErrors] = useState({});
   const [submitLoading, setSubmitLoading] = useState(false);
   const [deleteError, setDeleteError] = useState('');
+  const [uploadLoading, setUploadLoading] = useState(false);
   const searchTimerRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   // Fetch breeds
   const fetchBreeds = async (page = 1, petTypeId = '', search = '') => {
@@ -88,7 +92,7 @@ const PetTypeBreeds = () => {
 
   // Open create modal
   const handleCreate = () => {
-    setFormData({ name: '', petTypeId: '' });
+    setFormData({ name: '', petTypeId: '', imageUrl: '' });
     setFormErrors({});
     setIsCreateModalOpen(true);
   };
@@ -99,6 +103,7 @@ const PetTypeBreeds = () => {
     setFormData({
       name: breed.name || '',
       petTypeId: breed.petTypeId || '',
+      imageUrl: breed.imageUrl || '',
     });
     setFormErrors({});
     setIsEditModalOpen(true);
@@ -133,6 +138,24 @@ const PetTypeBreeds = () => {
     }
   };
 
+  // Handle file upload
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadLoading(true);
+    try {
+      const response = await adminFilesService.uploadFile(file);
+      const url = response.data?.signedUrl || response.data?.publicUrl || response.data?.url || '';
+      setFormData((prev) => ({ ...prev, imageUrl: url }));
+    } catch {
+      setFormErrors((prev) => ({ ...prev, imageUrl: 'Failed to upload image' }));
+    } finally {
+      setUploadLoading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   // Submit create
   const handleCreateSubmit = async () => {
     if (!validateForm()) return;
@@ -142,6 +165,7 @@ const PetTypeBreeds = () => {
       await adminPetTypeBreedsService.createPetTypeBreed({
         name: formData.name,
         petTypeId: parseInt(formData.petTypeId, 10),
+        imageUrl: formData.imageUrl || undefined,
       });
       setIsCreateModalOpen(false);
       fetchBreeds(currentPage, filterPetTypeId, searchTerm);
@@ -163,6 +187,7 @@ const PetTypeBreeds = () => {
       await adminPetTypeBreedsService.updatePetTypeBreed(selectedBreed.id, {
         name: formData.name,
         petTypeId: parseInt(formData.petTypeId, 10),
+        imageUrl: formData.imageUrl || undefined,
       });
       setIsEditModalOpen(false);
       fetchBreeds(currentPage, filterPetTypeId, searchTerm);
@@ -234,15 +259,74 @@ const PetTypeBreeds = () => {
           <span className={styles.errorText}>{formErrors.petTypeId}</span>
         )}
       </div>
+
+      <div>
+        <label className={styles.label}>Image</label>
+        <div className={styles.uploadRow}>
+          <button
+            type="button"
+            className={styles.uploadButton}
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploadLoading}
+          >
+            {uploadLoading ? (
+              <PawLoader size="small" />
+            ) : (
+              <>
+                <i className="bi bi-upload"></i>
+                Upload
+              </>
+            )}
+          </button>
+          <span className={styles.orText}>or</span>
+          <input
+            type="text"
+            name="imageUrl"
+            value={formData.imageUrl}
+            onChange={handleInputChange}
+            placeholder="Paste image URL"
+            className={styles.urlInput}
+          />
+        </div>
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileUpload}
+          accept="image/*"
+          style={{ display: 'none' }}
+        />
+        {formErrors.imageUrl && (
+          <span className={styles.errorText}>{formErrors.imageUrl}</span>
+        )}
+      </div>
+
+      {formData.imageUrl?.startsWith('http') && (
+        <div className={styles.imagePreview}>
+          <img src={formData.imageUrl} alt="Preview" />
+        </div>
+      )}
     </div>
   );
 
   // Table columns
   const columns = [
     {
+      key: 'imageUrl',
+      label: '',
+      width: '60px',
+      render: (row) =>
+        row.imageUrl?.startsWith('http') ? (
+          <img src={row.imageUrl} alt={row.name} className={styles.breedImage} />
+        ) : (
+          <div className={styles.noImage}>
+            <i className="bi bi-image"></i>
+          </div>
+        ),
+    },
+    {
       key: 'name',
       label: 'Breed Name',
-      width: '35%',
+      width: '25%',
     },
     {
       key: 'petType',
@@ -311,7 +395,7 @@ const PetTypeBreeds = () => {
 
       {/* Data Table */}
       {loading ? (
-        <TablePageSkeleton columns={3} rows={8} />
+        <TablePageSkeleton columns={4} rows={8} />
       ) : (
         <DataTable
           columns={columns}
