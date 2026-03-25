@@ -4,6 +4,7 @@ import adminUsersService from '../../services/adminUsersService';
 import adminPetsService from '../../services/adminPetsService';
 import adminAdminsService from '../../services/adminAdminsService';
 import adminPetTypesService from '../../services/adminPetTypesService';
+import adminNotificationsService from '../../services/adminNotificationsService';
 import PawLoader from '../../components/common/PawLoader/PawLoader';
 import styles from './Dashboard.module.scss';
 
@@ -14,6 +15,7 @@ const Dashboard = () => {
     pets: 0,
     admins: 0,
     petTypes: 0,
+    notifications: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -26,6 +28,7 @@ const Dashboard = () => {
         let petsCount = 0;
         let adminsCount = 0;
         let petTypesCount = 0;
+        let notificationsCount = 0;
 
         // Fetch users
         try {
@@ -60,9 +63,15 @@ const Dashboard = () => {
           const petTypesRes = await adminPetTypesService.getAllPetTypes(1, 1);
           petTypesCount = petTypesRes.meta?.total || 0;
         } catch (err) {
-          // Error fetching pet types
           console.error(err);
+        }
 
+        // Fetch notifications
+        try {
+          const notificationsRes = await adminNotificationsService.getAllNotifications(1, 1);
+          notificationsCount = notificationsRes.meta?.total || 0;
+        } catch (err) {
+          console.error(err);
         }
 
         setStats({
@@ -70,6 +79,7 @@ const Dashboard = () => {
           pets: petsCount,
           admins: adminsCount,
           petTypes: petTypesCount,
+          notifications: notificationsCount,
         });
       } catch (error) {
         // Error fetching stats
@@ -134,6 +144,18 @@ const Dashboard = () => {
             <h3>Pet Types</h3>
             <p className={styles.statNumber}>
               {loading ? <PawLoader /> : stats.petTypes}
+            </p>
+          </div>
+        </div>
+
+        <div className={styles.statCard} onClick={() => navigate('/admin/notifications')}>
+          <div className={styles.statIcon}>
+            <i className="bi bi-bell"></i>
+          </div>
+          <div className={styles.statContent}>
+            <h3>Notifications</h3>
+            <p className={styles.statNumber}>
+              {loading ? <PawLoader /> : stats.notifications}
             </p>
           </div>
         </div>

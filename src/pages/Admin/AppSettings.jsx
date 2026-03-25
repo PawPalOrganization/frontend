@@ -135,6 +135,10 @@ const AppSettings = () => {
     }
   };
 
+  // Preview modal state
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [previewContent, setPreviewContent] = useState('');
+
   // Check if setting needs rich text editor
   const isRichTextSetting = (token) => token === 'terms_and_conditions';
 
@@ -167,6 +171,16 @@ const AppSettings = () => {
               placeholder="Write terms and conditions content..."
             />
           </div>
+          {formData.value && formData.value !== '<p><br></p>' && (
+            <div className={styles.livePreviewSection}>
+              <label className={styles.label}>Preview</label>
+              <div
+                className={styles.livePreview}
+                lang="en"
+                dangerouslySetInnerHTML={{ __html: formData.value }}
+              />
+            </div>
+          )}
         </div>
       ) : (
         <Input
@@ -207,7 +221,25 @@ const AppSettings = () => {
       render: (row) => {
         const val = row.value?.value != null ? String(row.value.value) : '';
         if (isRichTextSetting(row.token) && val) {
-          return <span className={styles.valueCell}>HTML Content</span>;
+          return (
+            <div className={styles.richValueCell}>
+              <div
+                className={styles.richPreviewSnippet}
+                dangerouslySetInnerHTML={{ __html: val }}
+              />
+              <button
+                className={styles.previewButton}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setPreviewContent(val);
+                  setIsPreviewModalOpen(true);
+                }}
+                title="Preview"
+              >
+                <i className="bi bi-eye"></i>
+              </button>
+            </div>
+          );
         }
         return (
           <span className={styles.valueCell}>
@@ -302,6 +334,28 @@ const AppSettings = () => {
         }
       >
         {renderFormFields()}
+      </Modal>
+
+      {/* Preview Modal */}
+      <Modal
+        isOpen={isPreviewModalOpen}
+        onClose={() => setIsPreviewModalOpen(false)}
+        title="Terms & Conditions Preview"
+        size="large"
+        footer={
+          <Button
+            variant="outline"
+            onClick={() => setIsPreviewModalOpen(false)}
+          >
+            Close
+          </Button>
+        }
+      >
+        <div
+          className={styles.fullPreview}
+          lang="en"
+          dangerouslySetInnerHTML={{ __html: previewContent }}
+        />
       </Modal>
     </div>
   );

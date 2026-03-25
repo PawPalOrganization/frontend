@@ -10,6 +10,7 @@ import Pets from './pages/Admin/Pets';
 import PetTypes from './pages/Admin/PetTypes';
 import PetTypeBreeds from './pages/Admin/PetTypeBreeds';
 import Admins from './pages/Admin/Admins';
+import Notifications from './pages/Admin/Notifications';
 
 const AppSettings = lazy(() => import('./pages/Admin/AppSettings'));
 
@@ -38,6 +39,7 @@ function App() {
             <Route path="pet-types" element={<PetTypes />} />
             <Route path="pet-type-breeds" element={<PetTypeBreeds />} />
             <Route path="admins" element={<Admins />} />
+            <Route path="notifications" element={<Notifications />} />
             <Route path="app-settings" element={<Suspense fallback={null}><AppSettings /></Suspense>} />
             <Route path="account" element={<div>Account Settings</div>} />
             <Route path="settings" element={<div>Settings</div>} />
