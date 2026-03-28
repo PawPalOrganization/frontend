@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import adminNotificationsService from '../../services/adminNotificationsService';
 import adminUsersService from '../../services/adminUsersService';
+import adminAppSettingsService from '../../services/adminAppSettingsService';
 import Button from '../../components/common/Button/Button';
 import Input from '../../components/common/Input/Input';
 import styles from './Notifications.module.scss';
 
 const Notifications = () => {
+  // Notification system enabled state
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+
   // Users for selection
   const [users, setUsers] = useState([]);
   const [userSearchTerm, setUserSearchTerm] = useState('');
@@ -21,17 +25,27 @@ const Notifications = () => {
   const [submitLoading, setSubmitLoading] = useState(false);
   const [result, setResult] = useState(null);
 
-  // Fetch users for selection
+  // Fetch users and notification enabled state on mount
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchData = async () => {
       try {
-        const response = await adminUsersService.getUsersForDropdown();
-        setUsers(response.data || []);
+        const [usersRes, settingsRes] = await Promise.all([
+          adminUsersService.getUsersForDropdown(),
+          adminAppSettingsService.getAllAppSettings(1, 50),
+        ]);
+        setUsers(usersRes.data || []);
+
+        const notifSetting = (settingsRes.data || []).find(
+          (s) => s.token === 'enable_system_notifications'
+        );
+        if (notifSetting) {
+          setNotificationsEnabled(String(notifSetting.value?.value) === 'true');
+        }
       } catch (error) {
         console.error(error);
       }
     };
-    fetchUsers();
+    fetchData();
   }, []);
 
   // Handle form input change
@@ -112,6 +126,7 @@ const Notifications = () => {
 
   // Submit notification
   const handleSubmit = async () => {
+    if (!notificationsEnabled) return;
     if (!validateForm()) return;
 
     setSubmitLoading(true);
@@ -186,6 +201,17 @@ const Notifications = () => {
 
       {/* Send Form Card */}
       <div className={styles.formCard}>
+        {/* Notifications Disabled Banner */}
+        {!notificationsEnabled && (
+          <div className={styles.disabledBanner}>
+            <i className="bi bi-bell-slash"></i>
+            <div>
+              <strong>Notifications are disabled</strong>
+              <span>Enable system notifications in App Settings to send notifications.</span>
+            </div>
+          </div>
+        )}
+
         {/* Result Banner */}
         {result && (
           <div className={`${styles.resultBanner} ${result.success ? styles.resultSuccess : styles.resultError}`}>
@@ -327,6 +353,7 @@ const Notifications = () => {
               icon="bi-send"
               onClick={handleSubmit}
               loading={submitLoading}
+              disabled={!notificationsEnabled}
             >
               {formData.sendTo === 'all'
                 ? `Send to All Users (${users.length})`

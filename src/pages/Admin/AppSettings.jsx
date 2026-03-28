@@ -142,6 +142,9 @@ const AppSettings = () => {
   // Check if setting needs rich text editor
   const isRichTextSetting = (token) => token === 'terms_and_conditions';
 
+  // Check if setting is a boolean toggle
+  const isBooleanSetting = (token) => token === 'enable_system_notifications';
+
   // Render form fields
   const renderFormFields = () => (
     <div className={styles.form}>
@@ -181,6 +184,29 @@ const AppSettings = () => {
               />
             </div>
           )}
+        </div>
+      ) : isBooleanSetting(selectedSetting?.token) ? (
+        <div>
+          <label className={styles.label}>Value</label>
+          <div className={styles.toggleRow}>
+            <span className={styles.toggleLabel}>
+              {formData.value === 'true' ? 'Enabled' : 'Disabled'}
+            </span>
+            <button
+              type="button"
+              className={`${styles.toggle} ${formData.value === 'true' ? styles.toggleOn : styles.toggleOff}`}
+              onClick={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  value: prev.value === 'true' ? 'false' : 'true',
+                }))
+              }
+              role="switch"
+              aria-checked={formData.value === 'true'}
+            >
+              <span className={styles.toggleThumb} />
+            </button>
+          </div>
         </div>
       ) : (
         <Input
@@ -239,6 +265,13 @@ const AppSettings = () => {
                 <i className="bi bi-eye"></i>
               </button>
             </div>
+          );
+        }
+        if (isBooleanSetting(row.token)) {
+          return (
+            <span className={val === 'true' ? styles.badgeOn : styles.badgeOff}>
+              {val === 'true' ? 'ON' : 'OFF'}
+            </span>
           );
         }
         return (

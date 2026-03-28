@@ -373,6 +373,79 @@
   }
 }
 
+.badgeOn {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #E8F5E9;
+  color: #388E3C;
+}
+
+.badgeOff {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #FFEBEE;
+  color: #C62828;
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+}
+
+.toggleLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2C3E50;
+  min-width: 70px;
+}
+
+.toggle {
+  position: relative;
+  width: 52px;
+  height: 28px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.25s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.toggleOn {
+  background: #0D9AFF;
+}
+
+.toggleOff {
+  background: #CED4DA;
+}
+
+.toggleThumb {
+  position: absolute;
+  top: 3px;
+  width: 22px;
+  height: 22px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  transition: left 0.25s ease;
+
+  .toggleOn & {
+    left: 27px;
+  }
+
+  .toggleOff & {
+    left: 3px;
+  }
+}
+
 .editorWrapper {
   border-radius: 8px;
   overflow: hidden;
