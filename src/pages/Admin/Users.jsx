@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import adminUsersService from '../../services/adminUsersService';
+import adminUserRolesService from '../../services/adminUserRolesService';
 import DataTable from '../../components/common/DataTable/DataTable';
 import Button from '../../components/common/Button/Button';
 import Modal from '../../components/common/Modal/Modal';
@@ -14,6 +15,9 @@ const Users = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
+
+  // User roles for dropdown
+  const [userRoles, setUserRoles] = useState([]);
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -30,6 +34,7 @@ const Users = () => {
     password: '',
     birthDate: '',
     gender: 'male',
+    userRoleId: '',
   });
   const [formErrors, setFormErrors] = useState({});
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -51,8 +56,19 @@ const Users = () => {
     }
   };
 
+  // Fetch user roles for dropdown
+  const fetchUserRoles = async () => {
+    try {
+      const response = await adminUserRolesService.getAllUserRoles(1, 100);
+      setUserRoles(response.data || []);
+    } catch (error) {
+      // Error fetching user roles
+    }
+  };
+
   useEffect(() => {
     fetchUsers(1, searchTerm);
+    fetchUserRoles();
   }, []);
 
   // Handle search with debounce
@@ -80,6 +96,7 @@ const Users = () => {
       password: '',
       birthDate: '',
       gender: 'male',
+      userRoleId: '',
     });
     setFormErrors({});
     setIsCreateModalOpen(true);
@@ -96,6 +113,7 @@ const Users = () => {
       password: '', // Don't pre-fill password
       birthDate: user.birthDate ? user.birthDate.split('T')[0] : '',
       gender: user.gender || 'male',
+      userRoleId: user.userRoleId || user.userRole?.id || '',
     });
     setFormErrors({});
     setIsEditModalOpen(true);
@@ -139,6 +157,10 @@ const Users = () => {
       errors.birthDate = 'Birth date is required';
     }
 
+    if (!isEdit && !formData.userRoleId) {
+      errors.userRoleId = 'Role is required';
+    }
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -158,7 +180,11 @@ const Users = () => {
 
     setSubmitLoading(true);
     try {
-      await adminUsersService.createUser(formData);
+      const createData = {
+        ...formData,
+        userRoleId: parseInt(formData.userRoleId, 10),
+      };
+      await adminUsersService.createUser(createData);
       setIsCreateModalOpen(false);
       fetchUsers(currentPage, searchTerm);
     } catch (error) {
@@ -180,6 +206,10 @@ const Users = () => {
       // Remove password if empty (don't update password)
       if (!updateData.password) {
         delete updateData.password;
+      }
+      // Include userRoleId as integer if set
+      if (updateData.userRoleId) {
+        updateData.userRoleId = parseInt(updateData.userRoleId, 10);
       }
 
       await adminUsersService.updateUser(selectedUser.id, updateData);
@@ -411,6 +441,28 @@ const Users = () => {
               </select>
             </div>
           </div>
+
+          <div>
+            <label className={styles.label}>
+              Role <span style={{ color: '#E74C3C' }}>*</span>
+            </label>
+            <select
+              name="userRoleId"
+              value={formData.userRoleId}
+              onChange={handleInputChange}
+              className={`${styles.select} ${formErrors.userRoleId ? styles.selectError : ''}`}
+            >
+              <option value="">Select Role</option>
+              {userRoles.map((role) => (
+                <option key={role.id} value={role.id}>
+                  {role.name}
+                </option>
+              ))}
+            </select>
+            {formErrors.userRoleId && (
+              <span className={styles.errorText}>{formErrors.userRoleId}</span>
+            )}
+          </div>
         </div>
       </Modal>
 
@@ -525,6 +577,23 @@ const Users = () => {
                 <option value="female">Female</option>
               </select>
             </div>
+          </div>
+
+          <div>
+            <label className={styles.label}>Role</label>
+            <select
+              name="userRoleId"
+              value={formData.userRoleId}
+              onChange={handleInputChange}
+              className={styles.select}
+            >
+              <option value="">Select Role</option>
+              {userRoles.map((role) => (
+                <option key={role.id} value={role.id}>
+                  {role.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </Modal>
