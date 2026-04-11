@@ -606,11 +606,19 @@ const Pets = () => {
       key: 'size',
       label: 'Size',
       width: '10%',
-      render: (row) => (
-        <span className={styles.sizeBadge}>
-          {row.size || 'N/A'}
-        </span>
-      ),
+      render: (row) => {
+        const sizeLabels = {
+          'Extra Large': 'XL',
+          'Large': 'L',
+          'Medium': 'M',
+          'Small': 'S',
+        };
+        return (
+          <span className={styles.sizeBadge}>
+            {sizeLabels[row.size] || row.size || 'N/A'}
+          </span>
+        );
+      },
     },
     {
       key: 'weight',

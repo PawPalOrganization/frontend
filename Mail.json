@@ -1,0 +1,2719 @@
+{
+  "info": {
+    "_postman_id": "pawpal-backend-api",
+    "name": "PawPal Backend API",
+    "description": "Postman collection for PawPal Backend API - Mobile and Dashboard endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Mobile API",
+      "item": [
+        {
+          "name": "Auth",
+          "item": [
+            {
+              "name": "Register",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "    const response = pm.response.json();",
+                      "    if (response.data && response.data.token) {",
+                      "        pm.environment.set(\"authToken\", response.data.token);",
+                      "        pm.environment.set(\"userId\", response.data.user.id);",
+                      "    }",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"phoneNumber\": \"+1234567890\",\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"password123\",\n    \"confirmPassword\": \"password123\",\n    \"birthDate\": \"1990-01-15\",\n    \"gender\": \"male\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/register",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "auth", "register"]
+                },
+                "description": "Register a new user account. confirmPassword must match password. Returns user data and JWT token."
+              },
+              "response": []
+            },
+            {
+              "name": "Login",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 200) {",
+                      "    const response = pm.response.json();",
+                      "    if (response.data && response.data.token) {",
+                      "        pm.environment.set(\"authToken\", response.data.token);",
+                      "        pm.environment.set(\"userId\", response.data.user.id);",
+                      "    }",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"password123\",\n    \"deviceToken\": \"example-device-token\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "auth", "login"]
+                },
+                "description": "Login with email and password. Returns user data and JWT token."
+              },
+              "response": []
+            },
+            {
+              "name": "Refresh Token",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 200) {",
+                      "    const response = pm.response.json();",
+                      "    if (response.data && response.data.token) {",
+                      "        pm.environment.set(\"authToken\", response.data.token);",
+                      "        pm.environment.set(\"userId\", response.data.user.id);",
+                      "    }",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/refresh",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "auth", "refresh"]
+                },
+                "description": "Refresh JWT token using the bearer token. Returns the same response shape as login."
+              },
+              "response": []
+            }
+          ],
+          "description": "Mobile API authentication endpoints for user registration and login"
+        },
+        {
+          "name": "Pets",
+          "item": [
+            {
+              "name": "Create Pet",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Buddy\",\n    \"petTypeId\": 1,\n    \"petTypeBreedId\": 1,\n    \"size\": \"Large\",\n    \"weight\": \"30 kg\",\n    \"age\": \"3 years\",\n    \"notes\": \"Very friendly and loves to play fetch.\",\n    \"imageUrl\": \"https://example.com/pets/buddy.jpg\",\n    \"birthdate\": \"2021-01-15\",\n    \"adoptionDate\": \"2021-03-20\",\n    \"gender\": \"Male\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/pets",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "pets"]
+                },
+                "description": "Create a new pet for the authenticated user. Requires user authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Pets",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/pets",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "pets"]
+                },
+                "description": "Get all pets belonging to the authenticated user. Requires user authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Pet by ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/pets/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "pets", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "",
+                      "description": "Pet ID"
+                    }
+                  ]
+                },
+                "description": "Get a single pet by ID (only if it belongs to the authenticated user). Requires user authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Update Pet",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated Pet Name\",\n    \"petTypeBreedId\": 1,\n    \"weight\": \"35 kg\",\n    \"age\": \"4 years\",\n    \"notes\": \"Now calmer around strangers.\",\n    \"imageUrl\": \"https://example.com/pets/buddy-new.jpg\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/pets/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "pets", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "",
+                      "description": "Pet ID"
+                    }
+                  ]
+                },
+                "description": "Update a pet (only if it belongs to the authenticated user). All fields are optional. Requires user authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Pet",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/pets/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "pets", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "",
+                      "description": "Pet ID"
+                    }
+                  ]
+                },
+                "description": "Delete a pet (only if it belongs to the authenticated user). All reminders linked to this pet will also be deleted. Requires user authentication."
+              },
+              "response": []
+            }
+          ],
+          "description": "Pet CRUD operations for mobile users. All endpoints require user authentication."
+        },
+        {
+          "name": "Users",
+          "item": [
+            {
+              "name": "Me",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/me",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "users", "me"]
+                },
+                "description": "Get authenticated user data. Requires user authentication."
+              },
+              "response": []
+            }
+          ],
+          "description": "Mobile user endpoints. Requires user authentication."
+        },
+        {
+          "name": "Pet Types",
+          "item": [
+            {
+              "name": "Get Pet Types",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/pet-types?search=",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "pet-types"],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Search by pet type name",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Get pet types for mobile clients (public). Supports optional search by name."
+              },
+              "response": []
+            }
+          ],
+          "description": "Pet type reference data for mobile clients."
+        },
+        {
+          "name": "Pet Type Breeds",
+          "item": [
+            {
+              "name": "Get Pet Type Breeds",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/pet-type-breeds?petTypeId=1&search=",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "pet-type-breeds"],
+                  "query": [
+                    {
+                      "key": "petTypeId",
+                      "value": "1",
+                      "description": "Filter by pet type ID",
+                      "disabled": true
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Search by breed name",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Get pet type breeds for mobile clients (public). Supports filtering by petTypeId and searching by name."
+              },
+              "response": []
+            }
+          ],
+          "description": "Pet type breed reference data for mobile clients."
+        },
+        {
+          "name": "Reminder Types",
+          "item": [
+            {
+              "name": "Get Reminder Types",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/reminder-types?search=",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "reminder-types"],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Search by reminder type title",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Get reminder types for mobile clients (public). Supports optional search by title."
+              },
+              "response": []
+            }
+          ],
+          "description": "Reminder type reference data for mobile clients."
+        },
+        {
+          "name": "Reminders",
+          "item": [
+            {
+              "name": "Create Reminder",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Vet Visit\",\n  \"description\": \"Bring vaccination card\",\n  \"notifyAt\": \"2026-02-02T10:30\",\n  \"reminderDate\": \"2026-02-02T00:00\",\n  \"reminderTypeId\": 1,\n  \"petId\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/reminders",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "reminders"]
+                },
+                "description": "Create a reminder for the authenticated user. petId is required and must reference a pet belonging to the user. Dates are parsed using app_time_zone_offset."
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Reminders",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/reminders?search=",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "reminders"],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Search by reminder title",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Get all reminders for the authenticated user. Supports optional search by title."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Reminder by ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/reminders/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "reminders", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "",
+                      "description": "Reminder ID"
+                    }
+                  ]
+                },
+                "description": "Get a single reminder by ID (only if it belongs to the authenticated user)."
+              },
+              "response": []
+            },
+            {
+              "name": "Update Reminder",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Updated Reminder Title\",\n  \"notifyAt\": \"2026-02-02T10:45\",\n  \"petId\": 2\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/reminders/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "reminders", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "",
+                      "description": "Reminder ID"
+                    }
+                  ]
+                },
+                "description": "Update a reminder (only if it belongs to the authenticated user). All fields are optional. petId, if provided, must reference a pet belonging to the user."
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Reminder",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/reminders/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "reminders", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "",
+                      "description": "Reminder ID"
+                    }
+                  ]
+                },
+                "description": "Delete a reminder (only if it belongs to the authenticated user)."
+              },
+              "response": []
+            }
+          ],
+          "description": "Reminder CRUD operations for mobile users. All endpoints require user authentication."
+        },
+        {
+          "name": "Files",
+          "item": [
+            {
+              "name": "Upload File",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "description": "File to upload (field name must be: file)"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/files/upload?prefix=uploads/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "files", "upload"],
+                  "query": [
+                    {
+                      "key": "prefix",
+                      "value": "uploads/",
+                      "description": "Optional key prefix appended under users/<userId>/ (e.g. uploads/)",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Uploads a file to the Railway bucket and returns { bucket, key, signedUrl, publicUrl }.\n\nRequires user auth (Bearer {{authToken}})."
+              },
+              "response": []
+            }
+          ],
+          "description": "Mobile file upload endpoints. All endpoints require user authentication."
+        },
+        {
+          "name": "Notifications",
+          "description": "Notification endpoints for mobile users. Requires a valid user JWT token.",
+          "item": [
+            {
+              "name": "Get Notifications",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/notifications?page=1&limit=20",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "notifications"],
+                  "query": [
+                    { "key": "page", "value": "1", "description": "Page number (default: 1)" },
+                    { "key": "limit", "value": "20", "description": "Items per page, max 100 (default: 20)" },
+                    { "key": "isRead", "value": "false", "description": "Filter by read status: true or false", "disabled": true },
+                    { "key": "type", "value": "reminder", "description": "Filter by type: reminder, pet, system", "disabled": true }
+                  ]
+                },
+                "description": "Get all notifications for the authenticated user. Supports pagination and filtering by isRead and type."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Unread Count",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/notifications/unread-count",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "notifications", "unread-count"]
+                },
+                "description": "Returns the count of unread notifications for the authenticated user. Response: { count: number }."
+              },
+              "response": []
+            },
+            {
+              "name": "Mark Notification as Seen",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/notifications/{{notificationId}}/seen",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "notifications", "{{notificationId}}", "seen"]
+                },
+                "description": "Marks a notification as read. The notification must belong to the authenticated user."
+              },
+              "response": []
+            },
+            {
+              "name": "Mark All Notifications as Seen",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/notifications/seen-all",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "notifications", "seen-all"]
+                },
+                "description": "Marks all unread notifications as read for the authenticated user. Response: { updated: number }."
+              },
+              "response": []
+            }
+          ]
+        }
+      ],
+      "description": "Mobile API endpoints for mobile applications"
+    },
+    {
+      "name": "Dashboard API",
+      "item": [
+        {
+          "name": "Admin Auth",
+          "item": [
+            {
+              "name": "Admin Login",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 200) {",
+                      "    const response = pm.response.json();",
+                      "    if (response.data && response.data.token) {",
+                      "        pm.environment.set(\"adminToken\", response.data.token);",
+                      "        pm.environment.set(\"adminId\", response.data.admin.id);",
+                      "    }",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"superadmin@admin.com\",\n    \"password\": \"admin123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "auth", "login"]
+                },
+                "description": "Admin login. Returns admin data and JWT token. Use this token for authenticated dashboard endpoints."
+              },
+              "response": []
+            }
+          ],
+          "description": "Dashboard authentication endpoints for admin login"
+        },
+        {
+          "name": "Admins",
+          "item": [
+            {
+              "name": "Get All Admins",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/admins?page=1&limit=10&search=",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "admins"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "description": "Items per page"
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Search by name or email",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Get all admins with pagination and optional search. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Admin by ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/admins/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "admins", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Admin ID"
+                    }
+                  ]
+                },
+                "description": "Get admin details by ID. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Create Admin",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Admin User\",\n    \"email\": \"admin@example.com\",\n    \"password\": \"password123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/admins",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "admins"]
+                },
+                "description": "Create a new admin. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Update Admin",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated Admin Name\",\n    \"email\": \"updated@example.com\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/admins/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "admins", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Admin ID"
+                    }
+                  ]
+                },
+                "description": "Update admin details. All fields are optional. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Admin",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/admins/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "admins", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Admin ID"
+                    }
+                  ]
+                },
+                "description": "Delete an admin. You cannot delete your own account. Requires admin authentication."
+              },
+              "response": []
+            }
+          ],
+          "description": "Admin CRUD operations. All endpoints require admin authentication."
+        },
+        {
+          "name": "Users",
+          "item": [
+            {
+              "name": "Get All Users",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/users?page=1&limit=10&search=",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "users"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "description": "Items per page"
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Search by name, email, or phone",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Get all users with pagination and optional search. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Get User by ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/users/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "users", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "User ID"
+                    }
+                  ]
+                },
+                "description": "Get user details by ID. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Create User",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"firstName\": \"Jane\",\n    \"lastName\": \"Smith\",\n    \"phoneNumber\": \"+1987654321\",\n    \"email\": \"jane.smith@example.com\",\n    \"password\": \"password123\",\n    \"birthDate\": \"1995-05-20\",\n    \"gender\": \"female\",\n    \"userRoleId\": {{userRoleId}}\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/users",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "users"]
+                },
+                "description": "Create a new user. userRoleId is required (use GET /admin/api/user-roles to list roles). Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Update User",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"firstName\": \"Updated First Name\",\n    \"lastName\": \"Updated Last Name\",\n    \"userRoleId\": {{userRoleId}}\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/users/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "users", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "User ID"
+                    }
+                  ]
+                },
+                "description": "Update user details. userRoleId is required (other fields optional). Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Delete User",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/users/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "users", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "User ID"
+                    }
+                  ]
+                },
+                "description": "Delete a user. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Users for Dropdown",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/users/dropdown?search=",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "users", "dropdown"],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Search by name or email",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Get users for dropdown (limited to id, name, email only). Requires admin authentication."
+              },
+              "response": []
+            }
+          ],
+          "description": "User CRUD operations. All endpoints require admin authentication."
+        },
+        {
+          "name": "Permissions",
+          "item": [
+            {
+              "name": "Get All Permissions",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/permissions",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "permissions"]
+                },
+                "description": "Returns all permissions (id, name, token, description) for assigning to user roles in the dashboard."
+              },
+              "response": []
+            }
+          ],
+          "description": "Permission catalog for RBAC. Requires admin authentication."
+        },
+        {
+          "name": "User Roles",
+          "item": [
+            {
+              "name": "Get All User Roles",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/user-roles?page=1&limit=10&search=",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "user-roles"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "description": "Items per page"
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Search by role name",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "List user roles with pagination and optional search. Each role includes its permissions."
+              },
+              "response": []
+            },
+            {
+              "name": "Get User Role by ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/user-roles/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "user-roles", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "User role ID"
+                    }
+                  ]
+                },
+                "description": "Get a single user role with its permissions."
+              },
+              "response": []
+            },
+            {
+              "name": "Create User Role",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Custom Role\",\n    \"description\": \"Optional description\",\n    \"permissionIds\": [1, 2, 3]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/user-roles",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "user-roles"]
+                },
+                "description": "Create a user role. permissionIds must reference ids from GET /admin/api/permissions."
+              },
+              "response": []
+            },
+            {
+              "name": "Update User Role",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated Role Name\",\n    \"description\": \"Updated description\",\n    \"permissionIds\": [1, 2]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/user-roles/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "user-roles", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "User role ID"
+                    }
+                  ]
+                },
+                "description": "Update a user role. permissionIds replaces the full set when provided."
+              },
+              "response": []
+            },
+            {
+              "name": "Delete User Role",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/user-roles/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "user-roles", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "User role ID"
+                    }
+                  ]
+                },
+                "description": "Delete a user role if no users are assigned to it. Cannot delete the Pet Owner role."
+              },
+              "response": []
+            }
+          ],
+          "description": "User role CRUD for mobile RBAC. Requires admin authentication."
+        },
+        {
+          "name": "Pets",
+          "item": [
+            {
+              "name": "Get All Pets",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/pets?page=1&limit=10&search=&userId=&petTypeId=",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "pets"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "description": "Items per page"
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Search by name or breed",
+                      "disabled": true
+                    },
+                    {
+                      "key": "userId",
+                      "value": "",
+                      "description": "Filter by user ID",
+                      "disabled": true
+                    },
+                    {
+                      "key": "petTypeId",
+                      "value": "",
+                      "description": "Filter by pet type ID",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Get all pets with pagination, search, and filters. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Pet by ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/pets/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "pets", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "",
+                      "description": "Pet ID"
+                    }
+                  ]
+                },
+                "description": "Get pet details by ID. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Create Pet",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Buddy\",\n    \"petTypeId\": 1,\n    \"petTypeBreedId\": 1,\n    \"size\": \"Large\",\n    \"weight\": \"30 kg\",\n    \"age\": \"3 years\",\n    \"notes\": \"Very friendly and loves to play fetch.\",\n    \"imageUrl\": \"https://example.com/pets/buddy.jpg\",\n    \"userId\": 1,\n    \"birthdate\": \"2021-01-15\",\n    \"adoptionDate\": \"2021-03-20\",\n    \"gender\": \"Male\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/pets",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "pets"]
+                },
+                "description": "Create a new pet. Requires userId in body. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Update Pet",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated Pet Name\",\n    \"petTypeBreedId\": 1,\n    \"weight\": \"35 kg\",\n    \"age\": \"4 years\",\n    \"notes\": \"Now calmer around strangers.\",\n    \"imageUrl\": \"https://example.com/pets/buddy-new.jpg\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/pets/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "pets", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "",
+                      "description": "Pet ID"
+                    }
+                  ]
+                },
+                "description": "Update pet details. All fields are optional. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Pet",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/pets/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "pets", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "",
+                      "description": "Pet ID"
+                    }
+                  ]
+                },
+                "description": "Delete a pet. All reminders linked to this pet will also be deleted. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Get User Pets",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/pets/user/:userId",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "pets", "user", ":userId"],
+                  "variable": [
+                    {
+                      "key": "userId",
+                      "value": "1",
+                      "description": "User ID"
+                    }
+                  ]
+                },
+                "description": "Get all pets for a specific user. Requires admin authentication."
+              },
+              "response": []
+            }
+          ],
+          "description": "Pet CRUD operations for admin dashboard. All endpoints require admin authentication."
+        },
+        {
+          "name": "Pet Types",
+          "item": [
+            {
+              "name": "Get All Pet Types",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/pet-types?page=1&limit=10&search=",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "pet-types"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "description": "Items per page"
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Search by name",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Get all pet types with pagination and optional search. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Pet Type by ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/pet-types/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "pet-types", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Pet Type ID"
+                    }
+                  ]
+                },
+                "description": "Get pet type details by ID. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Create Pet Type",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Hamster\",\n    \"imageUrl\": \"https://example.com/pet-types/hamster.png\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/pet-types",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "pet-types"]
+                },
+                "description": "Create a new pet type. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Update Pet Type",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated Pet Type Name\",\n    \"imageUrl\": \"https://example.com/pet-types/updated.png\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/pet-types/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "pet-types", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Pet Type ID"
+                    }
+                  ]
+                },
+                "description": "Update pet type details. All fields are optional. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Pet Type",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/pet-types/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "pet-types", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Pet Type ID"
+                    }
+                  ]
+                },
+                "description": "Delete a pet type. Cannot delete if pets are using this type. Requires admin authentication."
+              },
+              "response": []
+            }
+          ],
+          "description": "Pet Type CRUD operations. All endpoints require admin authentication."
+        },
+        {
+          "name": "Pet Type Breeds",
+          "item": [
+            {
+              "name": "Get All Pet Type Breeds",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/pet-type-breeds?page=1&limit=10&search=&petTypeId=",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "pet-type-breeds"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "description": "Items per page"
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Search by breed name",
+                      "disabled": true
+                    },
+                    {
+                      "key": "petTypeId",
+                      "value": "",
+                      "description": "Filter by pet type ID",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Get all pet type breeds with pagination, optional search, and optional petTypeId filter. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Pet Type Breed by ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/pet-type-breeds/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "pet-type-breeds", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Pet Type Breed ID"
+                    }
+                  ]
+                },
+                "description": "Get pet type breed details by ID. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Create Pet Type Breed",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"petTypeId\": 1,\n    \"name\": \"Golden Retriever\",\n    \"imageUrl\": \"https://example.com/breeds/golden-retriever.png\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/pet-type-breeds",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "pet-type-breeds"]
+                },
+                "description": "Create a new pet type breed. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Update Pet Type Breed",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated Breed Name\",\n    \"imageUrl\": \"https://example.com/breeds/updated.png\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/pet-type-breeds/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "pet-type-breeds", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Pet Type Breed ID"
+                    }
+                  ]
+                },
+                "description": "Update pet type breed details. All fields are optional. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Pet Type Breed",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/pet-type-breeds/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "pet-type-breeds", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Pet Type Breed ID"
+                    }
+                  ]
+                },
+                "description": "Delete a pet type breed. Cannot delete if pets are using this breed. Requires admin authentication."
+              },
+              "response": []
+            }
+          ],
+          "description": "Pet Type Breed CRUD operations. All endpoints require admin authentication."
+        },
+        {
+          "name": "App Settings",
+          "item": [
+            {
+              "name": "Get App Settings",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/app-settings",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "app-settings"]
+                },
+                "description": "Get all app settings. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Update App Settings (Bulk)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\n  {\n    \"id\": 1,\n    \"value\": {\n      \"value\": \"X\"\n    }\n  }\n]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/app-settings",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "app-settings"]
+                },
+                "description": "Bulk update app settings. Only updates the `value` JSON field.\n\nBody example: [{ id, value }]. Requires admin authentication."
+              },
+              "response": []
+            }
+          ],
+          "description": "Dashboard app settings endpoints. Requires admin authentication."
+        },
+        {
+          "name": "Reminder Types",
+          "item": [
+            {
+              "name": "Get All Reminder Types",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/reminder-types?page=1&limit=10&search=",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "reminder-types"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "description": "Items per page"
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Search by title",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Get all reminder types with pagination and optional search. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Reminder Type by ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/reminder-types/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "reminder-types", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Reminder Type ID"
+                    }
+                  ]
+                },
+                "description": "Get reminder type details by ID. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Create Reminder Type",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Medication\",\n  \"description\": \"Take medicine reminder\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/reminder-types",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "reminder-types"]
+                },
+                "description": "Create a new reminder type. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Update Reminder Type",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Updated Reminder Type\",\n  \"description\": \"Updated description\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/reminder-types/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "reminder-types", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Reminder Type ID"
+                    }
+                  ]
+                },
+                "description": "Update reminder type details. All fields are optional. Requires admin authentication."
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Reminder Type",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/reminder-types/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "reminder-types", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Reminder Type ID"
+                    }
+                  ]
+                },
+                "description": "Delete a reminder type. Cannot delete if reminders are using this type. Requires admin authentication."
+              },
+              "response": []
+            }
+          ],
+          "description": "Reminder Type CRUD operations. All endpoints require admin authentication."
+        },
+        {
+          "name": "Files",
+          "item": [
+            {
+              "name": "Upload File",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "description": "File to upload (field name must be: file)"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/files/upload?prefix=uploads/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "files", "upload"],
+                  "query": [
+                    {
+                      "key": "prefix",
+                      "value": "uploads/",
+                      "description": "Optional key prefix appended under admins/<adminId>/ (e.g. uploads/)",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Uploads a file to the Railway bucket and returns { bucket, key, signedUrl, publicUrl }.\n\nRequires admin auth (Bearer {{adminToken}})."
+              },
+              "response": []
+            }
+          ],
+          "description": "Dashboard file upload endpoints. All endpoints require admin authentication."
+        },
+        {
+          "name": "Notifications",
+          "description": "Notification management endpoints for admins. Requires a valid admin JWT token.",
+          "item": [
+            {
+              "name": "Send Notification to All Users",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Important Update\",\n  \"body\": \"We have exciting news for all PawPal users!\",\n  \"type\": \"system\",\n  \"data\": {}\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/notifications/send-all",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "notifications", "send-all"]
+                },
+                "description": "Broadcasts a push notification to all users who have a registered device token. Blocked if ENABLE_SYSTEM_NOTIFICATIONS is disabled. No persistent DB record is created."
+              },
+              "response": []
+            },
+            {
+              "name": "Send Notification to One User",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Hey there!\",\n  \"body\": \"This is a message just for you.\",\n  \"type\": \"system\",\n  \"data\": {}\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/notifications/send-user/{{userId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "notifications", "send-user", "{{userId}}"]
+                },
+                "description": "Sends a push notification to a single user identified by userId. Blocked if ENABLE_SYSTEM_NOTIFICATIONS is disabled. No persistent DB record is created."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Emails",
+          "description": "Admin email broadcast (same pattern as Notifications). Requires admin JWT. Blocked if transactional emails are off (enable_transactional_emails) or mail env is not configured.",
+          "item": [
+            {
+              "name": "Send Email to All Users",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"subject\": \"PawPal update\",\n  \"html\": \"<p>Hello,</p><p>This message was sent to all users with an email on file.</p>\",\n  \"text\": \"Hello,\\n\\nThis message was sent to all users with an email on file.\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/emails/send-all",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "emails", "send-all"]
+                },
+                "description": "Sends the same HTML email to every user with a non-empty email. Returns { sent, skipped, failed }. Skipped = no email on profile."
+              },
+              "response": []
+            },
+            {
+              "name": "Send Email to One User",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"subject\": \"Message from PawPal\",\n  \"html\": \"<p>Hello,</p><p>This is just for you.</p>\",\n  \"text\": \"Hello,\\n\\nThis is just for you.\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/api/emails/send-user/{{userId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "api", "emails", "send-user", "{{userId}}"]
+                },
+                "description": "Sends an HTML email to one user by userId. 400 if user has no email."
+              },
+              "response": []
+            }
+          ]
+        }
+      ],
+      "description": "Dashboard API endpoints for admin dashboard access"
+    },
+    {
+      "name": "Testing",
+      "item": [
+        {
+          "name": "Railway Bucket",
+          "item": [
+            {
+              "name": "Upload File",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "description": "File to upload (field name must be: file)"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/test/bucket/upload?prefix=uploads/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["test", "bucket", "upload"],
+                  "query": [
+                    {
+                      "key": "prefix",
+                      "value": "uploads/",
+                      "description": "Optional key prefix (e.g. uploads/)",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Uploads a file to the Railway bucket (S3-compatible) and returns { bucket, key, signedUrl, publicUrl }.\n\nRequires env: ENABLE_TEST_ROUTES=true and AWS_* bucket credentials on the server."
+              },
+              "response": []
+            },
+            {
+              "name": "Presign Get URL",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/test/bucket/presign?key=&expiresIn=3600",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["test", "bucket", "presign"],
+                  "query": [
+                    {
+                      "key": "key",
+                      "value": "",
+                      "description": "Object key returned from upload"
+                    },
+                    {
+                      "key": "expiresIn",
+                      "value": "3600",
+                      "description": "Signed URL TTL in seconds (min 60, max 7 days)",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Generates a signed GET URL for an existing object key.\n\nRequires env: ENABLE_TEST_ROUTES=true and AWS_* bucket credentials on the server."
+              },
+              "response": []
+            },
+            {
+              "name": "List Objects",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/test/bucket/list?prefix=&maxKeys=50",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["test", "bucket", "list"],
+                  "query": [
+                    {
+                      "key": "prefix",
+                      "value": "",
+                      "description": "Optional prefix to filter keys",
+                      "disabled": true
+                    },
+                    {
+                      "key": "maxKeys",
+                      "value": "50",
+                      "description": "Max results (1..1000)",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Lists bucket objects (optionally filtered by prefix).\n\nRequires env: ENABLE_TEST_ROUTES=true and AWS_* bucket credentials on the server."
+              },
+              "response": []
+            }
+          ],
+          "description": "Testing endpoints for Railway bucket (S3-compatible) integration. Disabled unless ENABLE_TEST_ROUTES=true."
+        },
+        {
+          "name": "Mail",
+          "item": [
+            {
+              "name": "Mail Status",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/test/mail/status",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["test", "mail", "status"]
+                },
+                "description": "Returns { provider, configured, transactionalEmailEnabled }. Does not send email.\n\n- `transactionalEmailEnabled`: AppSetting token `enable_transactional_emails` (same pattern as enable_system_notifications).\n- `configured`: MAIL_PROVIDER + provider env (e.g. RESEND_API_KEY + MAIL_FROM).\n\nRequires env: ENABLE_TEST_ROUTES=true."
+              },
+              "response": []
+            },
+            {
+              "name": "Send Test Email",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"to\": \"{{testMailTo}}\",\n    \"subject\": \"PawPal mail test\",\n    \"html\": \"<p>This is a <strong>test</strong> email from Postman.</p>\",\n    \"text\": \"This is a test email from Postman.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/test/mail/send",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["test", "mail", "send"]
+                },
+                "description": "Sends email via the app mail layer (`sendEmail` / MAIL_PROVIDER). Required JSON: to (string or array), subject, html. Optional: text, from, replyTo, cc, bcc, idempotencyKey.\n\nRequires env: ENABLE_TEST_ROUTES=true and provider config (e.g. MAIL_PROVIDER=resend, RESEND_API_KEY, MAIL_FROM). Set collection variable testMailTo to your inbox."
+              },
+              "response": []
+            }
+          ],
+          "description": "Testing endpoints for transactional mail (`/test/mail/*`). Disabled unless ENABLE_TEST_ROUTES=true."
+        }
+      ],
+      "description": "Testing-only endpoints. All routes are disabled unless ENABLE_TEST_ROUTES=true is set in the server environment."
+    },
+    {
+      "name": "Development API",
+      "item": [
+        {
+          "name": "Audit Logs",
+          "item": [
+            {
+              "name": "Get Audit Logs",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/dev/audit-logs?page=1&limit=20",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["dev", "audit-logs"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number (default: 1)"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "description": "Items per page (default: 20, max: 100)"
+                    },
+                    {
+                      "key": "method",
+                      "value": "GET",
+                      "description": "Filter by HTTP verb: GET | POST | PUT | PATCH | DELETE",
+                      "disabled": true
+                    },
+                    {
+                      "key": "path",
+                      "value": "/api/auth",
+                      "description": "Partial path match (LIKE %value%)",
+                      "disabled": true
+                    },
+                    {
+                      "key": "statusCode",
+                      "value": "200",
+                      "description": "Filter by exact status code",
+                      "disabled": true
+                    },
+                    {
+                      "key": "statusCodeMin",
+                      "value": "400",
+                      "description": "Status code range lower bound (inclusive). Combine with statusCodeMax for ranges like 400–499.",
+                      "disabled": true
+                    },
+                    {
+                      "key": "statusCodeMax",
+                      "value": "499",
+                      "description": "Status code range upper bound (inclusive)",
+                      "disabled": true
+                    },
+                    {
+                      "key": "actorType",
+                      "value": "user",
+                      "description": "Filter by actor type: user | admin | anonymous",
+                      "disabled": true
+                    },
+                    {
+                      "key": "actorId",
+                      "value": "1",
+                      "description": "Filter by exact actor ID",
+                      "disabled": true
+                    },
+                    {
+                      "key": "ipAddress",
+                      "value": "192.168",
+                      "description": "Partial IP address match (LIKE %value%)",
+                      "disabled": true
+                    },
+                    {
+                      "key": "dateFrom",
+                      "value": "2026-03-01T00:00:00",
+                      "description": "createdAt >= dateFrom (ISO date string)",
+                      "disabled": true
+                    },
+                    {
+                      "key": "dateTo",
+                      "value": "2026-03-31T23:59:59",
+                      "description": "createdAt <= dateTo (ISO date string)",
+                      "disabled": true
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "createdAt",
+                      "description": "Sort field: createdAt | updatedAt | method | path | statusCode | actorType | actorId | durationMs (default: createdAt)",
+                      "disabled": true
+                    },
+                    {
+                      "key": "sortOrder",
+                      "value": "DESC",
+                      "description": "Sort direction: ASC | DESC (default: DESC)",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Get paginated audit logs with optional filters.\n\nAll filter params are optional and can be combined freely.\n\nBlocked automatically when NODE_ENV=production."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Audit Log by ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/dev/audit-logs/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["dev", "audit-logs", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "",
+                      "description": "Audit log UUID"
+                    }
+                  ]
+                },
+                "description": "Get a single audit log entry by its UUID.\n\nBlocked automatically when NODE_ENV=production."
+              },
+              "response": []
+            }
+          ],
+          "description": "Audit log inspection endpoints. Returns stored request/response data with actor, IP, and timing info."
+        },
+        {
+          "name": "Permissions sync",
+          "item": [
+            {
+              "name": "Sync permissions from manifest",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"syncNewPermissionsToAllUserRoles\": false,\n    \"userRoleId\": \"all\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/dev/permissions/sync",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["dev", "permissions", "sync"]
+                },
+                "description": "Upserts rows from src/manifest/permissions.manifest.ts (updates name/description by token; tokens never change). Set syncNewPermissionsToAllUserRoles to true and userRoleId to a numeric role id or the string \"all\" to attach newly created permissions to roles (userRoleId required when propagation is enabled)."
+              },
+              "response": []
+            }
+          ],
+          "description": "Syncs the permission table from the manifest. Uses the same admin JWT as the dashboard."
+        }
+      ],
+      "description": "Development-only endpoints. All routes return 404 when NODE_ENV=production. No additional env variable required."
+    },
+    {
+      "name": "Public API",
+      "item": [
+        {
+          "name": "Get Terms and Conditions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/public/api/terms-and-conditions",
+              "host": ["{{baseUrl}}"],
+              "path": ["public", "api", "terms-and-conditions"]
+            },
+            "description": "Public endpoint to fetch Terms & Conditions value from AppSettings (token=terms_and_conditions)."
+          },
+          "response": []
+        }
+      ],
+      "description": "Public endpoints accessible from mobile/dashboard/web without authentication."
+    },
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        },
+        "description": "Health check endpoint to verify server is running"
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "domain",
+      "value": "https://backend-production-12d0.up.railway.app",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "notificationId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "userRoleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "testMailTo",
+      "value": "you@example.com",
+      "type": "string"
+    }
+  ]
+}

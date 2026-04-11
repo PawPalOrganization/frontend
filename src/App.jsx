@@ -12,6 +12,7 @@ import PetTypeBreeds from './pages/Admin/PetTypeBreeds';
 import Admins from './pages/Admin/Admins';
 import Notifications from './pages/Admin/Notifications';
 import UserRoles from './pages/Admin/UserRoles';
+import Emails from './pages/Admin/Emails';
 
 const AppSettings = lazy(() => import('./pages/Admin/AppSettings'));
 
@@ -42,6 +43,7 @@ function App() {
             <Route path="admins" element={<Admins />} />
             <Route path="notifications" element={<Notifications />} />
             <Route path="user-roles" element={<UserRoles />} />
+            <Route path="emails" element={<Emails />} />
             <Route path="app-settings" element={<Suspense fallback={null}><AppSettings /></Suspense>} />
             <Route path="account" element={<div>Account Settings</div>} />
             <Route path="settings" element={<div>Settings</div>} />

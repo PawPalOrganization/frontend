@@ -265,7 +265,11 @@ const Users = () => {
       label: 'Gender',
       width: '10%',
       render: (row) => (
-        <span className={styles.badge}>
+        <span
+          className={`${styles.badge} ${
+            row.gender?.toLowerCase() === 'female' ? styles.badgeFemale : ''
+          }`}
+        >
           {row.gender || 'N/A'}
         </span>
       ),

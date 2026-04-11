@@ -143,7 +143,8 @@ const AppSettings = () => {
   const isRichTextSetting = (token) => token === 'terms_and_conditions';
 
   // Check if setting is a boolean toggle
-  const isBooleanSetting = (token) => token === 'enable_system_notifications';
+  const isBooleanSetting = (token) =>
+    token === 'enable_system_notifications' || token === 'enable_transactional_emails';
 
   // Render form fields
   const renderFormFields = () => (
