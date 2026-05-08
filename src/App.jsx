@@ -13,6 +13,10 @@ import Admins from './pages/Admin/Admins';
 import Notifications from './pages/Admin/Notifications';
 import UserRoles from './pages/Admin/UserRoles';
 import Emails from './pages/Admin/Emails';
+import Clinics from './pages/Admin/Clinics';
+import ClinicServices from './pages/Admin/ClinicServices';
+import ClinicStaff from './pages/Admin/ClinicStaff';
+import ClinicStaffRoles from './pages/Admin/ClinicStaffRoles';
 
 const AppSettings = lazy(() => import('./pages/Admin/AppSettings'));
 
@@ -44,6 +48,10 @@ function App() {
             <Route path="notifications" element={<Notifications />} />
             <Route path="user-roles" element={<UserRoles />} />
             <Route path="emails" element={<Emails />} />
+            <Route path="clinics" element={<Clinics />} />
+            <Route path="clinic-services" element={<ClinicServices />} />
+            <Route path="clinic-staff" element={<ClinicStaff />} />
+            <Route path="clinic-staff-roles" element={<ClinicStaffRoles />} />
             <Route path="app-settings" element={<Suspense fallback={null}><AppSettings /></Suspense>} />
             <Route path="account" element={<div>Account Settings</div>} />
             <Route path="settings" element={<div>Settings</div>} />

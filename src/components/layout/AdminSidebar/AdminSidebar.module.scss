@@ -72,6 +72,17 @@
   overflow-y: auto;
 }
 
+.navDivider {
+  padding: 10px 1.25rem 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: rgba(255, 255, 255, 0.25);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  margin-top: 6px;
+}
+
 .navList {
   list-style: none;
   padding: 0;

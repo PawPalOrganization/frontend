@@ -25,6 +25,11 @@ const AdminSidebar = ({ isOpen = false, onClose = () => {} }) => {
     { path: '/admin/notifications', icon: 'bi-bell', label: 'Notifications' },
     { path: '/admin/emails', icon: 'bi-envelope', label: 'Emails' },
     { path: '/admin/app-settings', icon: 'bi-sliders', label: 'App Settings' },
+    { divider: true, label: 'Clinics' },
+    { path: '/admin/clinics', icon: 'bi-hospital', label: 'Clinics' },
+    { path: '/admin/clinic-services', icon: 'bi-scissors', label: 'Clinic Services' },
+    { path: '/admin/clinic-staff', icon: 'bi-person-badge', label: 'Clinic Staff' },
+    { path: '/admin/clinic-staff-roles', icon: 'bi-shield-plus', label: 'Staff Roles' },
   ];
 
   const handleNavClick = () => {
@@ -51,20 +56,26 @@ const AdminSidebar = ({ isOpen = false, onClose = () => {} }) => {
       {/* Main Navigation */}
       <nav className={styles.nav}>
         <ul className={styles.navList}>
-          {navItems.map((item) => (
-            <li key={item.path}>
-              <NavLink
-                to={item.path}
-                className={({ isActive }) =>
-                  `${styles.navLink} ${isActive ? styles.active : ''}`
-                }
-                onClick={handleNavClick}
-              >
-                <i className={`bi ${item.icon} ${styles.navIcon}`}></i>
+          {navItems.map((item) =>
+            item.divider ? (
+              <li key={`divider-${item.label}`} className={styles.navDivider}>
                 <span>{item.label}</span>
-              </NavLink>
-            </li>
-          ))}
+              </li>
+            ) : (
+              <li key={item.path}>
+                <NavLink
+                  to={item.path}
+                  className={({ isActive }) =>
+                    `${styles.navLink} ${isActive ? styles.active : ''}`
+                  }
+                  onClick={handleNavClick}
+                >
+                  <i className={`bi ${item.icon} ${styles.navIcon}`}></i>
+                  <span>{item.label}</span>
+                </NavLink>
+              </li>
+            )
+          )}
         </ul>
       </nav>
 

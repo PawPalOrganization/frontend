@@ -1,0 +1,543 @@
+.page {
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  @media (max-width: 991px) {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2C3E50;
+  margin: 0;
+
+  @media (max-width: 991px) {
+    font-size: 22px;
+  }
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #7F8C8D;
+  margin: 4px 0 0 0;
+}
+
+.searchBar {
+  margin-bottom: 24px;
+}
+
+.searchWrapper {
+  position: relative;
+  max-width: 400px;
+
+  @media (max-width: 991px) {
+    max-width: 100%;
+  }
+
+  i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #7F8C8D;
+    font-size: 16px;
+  }
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 16px 12px 44px;
+  border: 1px solid #DEE2E6;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #0D9AFF;
+    box-shadow: 0 0 0 3px rgba(13, 154, 255, 0.1);
+  }
+
+  &::placeholder {
+    color: #ADB5BD;
+  }
+
+  &:disabled {
+    background: #F8F9FA;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+// Status badges
+.statusBadge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.statusPending {
+  background: #FFF3CD;
+  color: #856404;
+}
+
+.statusApproved {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+.statusRejected {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+// Custom action buttons in table (no DataTable onEdit/onDelete)
+.actionButtons {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 13px;
+
+  i {
+    pointer-events: none;
+  }
+}
+
+.actionEdit {
+  background: #E3F2FD;
+  color: #1565C0;
+
+  &:hover {
+    background: #1565C0;
+    color: white;
+  }
+}
+
+.actionBranches {
+  background: #EDE7F6;
+  color: #4527A0;
+
+  &:hover {
+    background: #4527A0;
+    color: white;
+  }
+}
+
+.actionApprove {
+  background: #E8F5E9;
+  color: #1B5E20;
+
+  &:hover {
+    background: #1B5E20;
+    color: white;
+  }
+}
+
+.actionReject {
+  background: #FFF3E0;
+  color: #E65100;
+
+  &:hover {
+    background: #E65100;
+    color: white;
+  }
+}
+
+.actionDelete {
+  background: #FFEBEE;
+  color: #B71C1C;
+
+  &:hover {
+    background: #B71C1C;
+    color: white;
+  }
+}
+
+// Revert button — replaces approve/reject once a decision has been made
+.actionRevert {
+  background: #FFF8E1;
+  color: #F57F17;
+
+  &:hover {
+    background: #F57F17;
+    color: white;
+  }
+}
+
+// Info note shown in approve/reject modals when reversing a decision
+.statusNote {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #FFF8E1;
+  border: 1px solid #FFE082;
+  font-size: 13px;
+  color: #795548;
+  margin-bottom: 12px;
+
+  i {
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: #F57F17;
+  }
+}
+
+// Clinic form
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 8px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #495057;
+  cursor: pointer;
+
+  input[type='checkbox'] {
+    width: 16px;
+    height: 16px;
+    accent-color: #0D9AFF;
+    cursor: pointer;
+  }
+}
+
+.websiteLink {
+  color: #0D9AFF;
+  text-decoration: none;
+  font-size: 13px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.mainBranchBadge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  background: #D1FAE5;
+  color: #065F46;
+  margin-left: 6px;
+}
+
+.textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #DEE2E6;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #0D9AFF;
+    box-shadow: 0 0 0 3px rgba(13, 154, 255, 0.1);
+  }
+
+  &::placeholder {
+    color: #ADB5BD;
+  }
+}
+
+// Branches modal content
+.branchesModalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.branchesModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.branchesModalSubtitle {
+  font-size: 14px;
+  color: #7F8C8D;
+  margin: 0;
+}
+
+.branchesLoading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px;
+  color: #7F8C8D;
+  font-size: 14px;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #DEE2E6;
+  border-top-color: #0D9AFF;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.branchesEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  color: #ADB5BD;
+  gap: 12px;
+
+  i {
+    font-size: 2.5rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
+.branchesList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.branchCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border: 1px solid #DEE2E6;
+  border-radius: 10px;
+  background: #FAFBFC;
+  gap: 12px;
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: #0D9AFF;
+  }
+}
+
+.branchInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.branchName {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2C3E50;
+
+  i {
+    color: #7F8C8D;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+}
+
+.branchDetail {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #7F8C8D;
+
+  i {
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+}
+
+.branchActions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+// Service tags shown on each branch card in the list
+.branchServiceTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.branchServiceTag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #EDE7F6;
+  color: #4527A0;
+  white-space: nowrap;
+}
+
+.branchServiceTagMore {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #F1F3F5;
+  color: #7F8C8D;
+  white-space: nowrap;
+}
+
+// Service picker in branch form
+.servicesHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+
+  .label {
+    margin-bottom: 0;
+  }
+}
+
+.servicesCount {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  background: #4527A0;
+  color: white;
+}
+
+.noServicesText {
+  font-size: 13px;
+  color: #ADB5BD;
+  padding: 12px 14px;
+  border: 1px dashed #DEE2E6;
+  border-radius: 8px;
+  margin: 0;
+}
+
+.serviceChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid #DEE2E6;
+  border-radius: 10px;
+  background: #FAFBFC;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.serviceChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1.5px solid #DEE2E6;
+  background: white;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  i {
+    font-size: 12px;
+  }
+
+  &:hover {
+    border-color: #4527A0;
+    color: #4527A0;
+    background: #F3E8FF;
+  }
+}
+
+.serviceChipActive {
+  border-color: #4527A0;
+  background: #4527A0;
+  color: white;
+
+  &:hover {
+    background: #3B1F8C;
+    border-color: #3B1F8C;
+    color: white;
+  }
+}
+
+.serviceChipLogo {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  border-radius: 3px;
+}
