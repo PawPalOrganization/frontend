@@ -19,7 +19,7 @@ const EMPTY_FORM = {
   yearsOfExperience: '',
   roleId: '',
   selectedClinicId: '',
-  clinicBranchId: '',
+  clinicBranchIds: [],
 };
 
 const EMPTY_EDIT_FORM = {
@@ -28,6 +28,49 @@ const EMPTY_EDIT_FORM = {
   bio: '',
   yearsOfExperience: '',
   roleId: '',
+};
+
+const unwrapData = (response) => response?.data || response || {};
+
+const unwrapList = (response) => {
+  const data = unwrapData(response);
+  return Array.isArray(data) ? data : [];
+};
+
+const getBranchId = (branch) => branch?.id ?? branch?.branchId ?? branch?.clinicBranchId;
+
+const getBranchTitle = (branch) => branch?.title || branch?.name || `Branch #${getBranchId(branch)}`;
+
+const getBranchAddress = (branch) => branch?.address || branch?.location || branch?.city || '';
+
+const getMemberBranchIds = (member) => {
+  const branchIds = Array.isArray(member?.branches)
+    ? member.branches.map(getBranchId).filter(Boolean)
+    : [];
+
+  const directBranchId =
+    member?.clinicBranchId ||
+    member?.clinicBranch?.id ||
+    member?.branch?.id ||
+    member?.branchId;
+
+  return [...new Set([...branchIds, directBranchId].filter(Boolean).map(String))];
+};
+
+const getMemberClinicId = (member) => {
+  const firstBranch = Array.isArray(member?.branches) ? member.branches[0] : null;
+
+  return (
+    firstBranch?.clinicId ||
+    firstBranch?.clinic?.id ||
+    member?.clinicBranch?.clinicId ||
+    member?.clinicBranch?.clinic?.id ||
+    member?.branch?.clinicId ||
+    member?.branch?.clinic?.id ||
+    member?.clinicId ||
+    member?.clinic?.id ||
+    ''
+  );
 };
 
 const ClinicStaff = () => {
@@ -46,6 +89,10 @@ const ClinicStaff = () => {
   const [allClinics, setAllClinics] = useState([]);
   const [clinicBranches, setClinicBranches] = useState([]);
   const [branchesLoading, setBranchesLoading] = useState(false);
+  const [editClinicBranches, setEditClinicBranches] = useState([]);
+  const [editBranchesLoading, setEditBranchesLoading] = useState(false);
+  const [selectedEditClinicId, setSelectedEditClinicId] = useState('');
+  const [selectedEditBranchIds, setSelectedEditBranchIds] = useState([]);
 
   // ── Modals ────────────────────────────────────────────────────────────────
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -104,20 +151,92 @@ const ClinicStaff = () => {
 
   const handlePageChange = (page) => fetchStaff(page, searchTerm);
 
-  // ── Cascading clinic → branch (create form only) ───────────────────────────
+  // ── Cascading clinic → branches ───────────────────────────────────────────
   const handleClinicChange = async (clinicId) => {
-    setFormData((prev) => ({ ...prev, selectedClinicId: clinicId, clinicBranchId: '' }));
+    setFormData((prev) => ({ ...prev, selectedClinicId: clinicId, clinicBranchIds: [] }));
+    if (formErrors.clinicBranchIds) setFormErrors((prev) => ({ ...prev, clinicBranchIds: '' }));
     setClinicBranches([]);
     if (!clinicId) return;
     setBranchesLoading(true);
     try {
       const response = await adminClinicsService.getBranches(parseInt(clinicId, 10));
-      setClinicBranches(response.data || response || []);
+      setClinicBranches(unwrapList(response));
     } catch {
       setClinicBranches([]);
     } finally {
       setBranchesLoading(false);
     }
+  };
+
+  const loadEditBranches = async (clinicId) => {
+    setEditClinicBranches([]);
+    if (!clinicId) return;
+    setEditBranchesLoading(true);
+    try {
+      const response = await adminClinicsService.getBranches(parseInt(clinicId, 10));
+      setEditClinicBranches(unwrapList(response));
+    } catch {
+      setEditClinicBranches([]);
+    } finally {
+      setEditBranchesLoading(false);
+    }
+  };
+
+  const loadEditBranchesForMember = async (member, branchIds) => {
+    const clinicId = getMemberClinicId(member);
+    if (clinicId) {
+      setSelectedEditClinicId(String(clinicId));
+      await loadEditBranches(clinicId);
+      return;
+    }
+
+    if (branchIds.length === 0) {
+      setSelectedEditClinicId('');
+      setEditClinicBranches([]);
+      return;
+    }
+
+    setSelectedEditClinicId('');
+    setEditClinicBranches([]);
+    setEditBranchesLoading(true);
+    try {
+      const currentBranchId = branchIds[0];
+      for (const clinic of allClinics) {
+        const response = await adminClinicsService.getBranches(clinic.id);
+        const branches = unwrapList(response);
+        if (branches.some((branch) => String(getBranchId(branch)) === currentBranchId)) {
+          setSelectedEditClinicId(String(clinic.id));
+          setEditClinicBranches(branches);
+          return;
+        }
+      }
+    } catch {
+      setEditClinicBranches([]);
+    } finally {
+      setEditBranchesLoading(false);
+    }
+  };
+
+  const toggleCreateBranch = (branchId) => {
+    const id = String(branchId);
+    setFormData((prev) => {
+      const isSelected = prev.clinicBranchIds.includes(id);
+      return {
+        ...prev,
+        clinicBranchIds: isSelected
+          ? prev.clinicBranchIds.filter((selectedId) => selectedId !== id)
+          : [...prev.clinicBranchIds, id],
+      };
+    });
+    if (formErrors.clinicBranchIds) setFormErrors((prev) => ({ ...prev, clinicBranchIds: '' }));
+  };
+
+  const toggleEditBranch = (branchId) => {
+    const id = String(branchId);
+    setSelectedEditBranchIds((prev) =>
+      prev.includes(id) ? prev.filter((selectedId) => selectedId !== id) : [...prev, id]
+    );
+    if (formErrors.clinicBranchIds) setFormErrors((prev) => ({ ...prev, clinicBranchIds: '' }));
   };
 
   // ── Modal handlers ────────────────────────────────────────────────────────
@@ -129,6 +248,9 @@ const ClinicStaff = () => {
   };
 
   const handleEdit = (member) => {
+    const clinicId = getMemberClinicId(member);
+    const branchIds = getMemberBranchIds(member);
+
     setSelectedStaff(member);
     setEditFormData({
       firstName: member.firstName || '',
@@ -137,6 +259,9 @@ const ClinicStaff = () => {
       yearsOfExperience: member.yearsOfExperience ?? '',
       roleId: member.role?.id || member.roleId || '',
     });
+    setSelectedEditClinicId(clinicId ? String(clinicId) : '');
+    setSelectedEditBranchIds(branchIds);
+    loadEditBranchesForMember(member, branchIds);
     setFormErrors({});
     setIsEditModalOpen(true);
   };
@@ -154,6 +279,9 @@ const ClinicStaff = () => {
     if (!formData.lastName.trim()) errors.lastName = 'Last name is required';
     if (!formData.email.trim()) errors.email = 'Email is required';
     if (!formData.password.trim()) errors.password = 'Password is required';
+    if (formData.clinicBranchIds.length === 0) {
+      errors.clinicBranchIds = 'Select at least one branch';
+    }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -162,6 +290,9 @@ const ClinicStaff = () => {
     const errors = {};
     if (!editFormData.firstName.trim()) errors.firstName = 'First name is required';
     if (!editFormData.lastName.trim()) errors.lastName = 'Last name is required';
+    if (selectedEditBranchIds.length === 0) {
+      errors.clinicBranchIds = 'Select at least one branch';
+    }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -183,7 +314,8 @@ const ClinicStaff = () => {
     if (!validateCreateForm()) return;
     setSubmitLoading(true);
     try {
-      await adminClinicStaffService.createClinicStaff({
+      const clinicBranchIds = formData.clinicBranchIds.map((branchId) => parseInt(branchId, 10));
+      const response = await adminClinicStaffService.createClinicStaff({
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
@@ -192,12 +324,29 @@ const ClinicStaff = () => {
         gender: formData.gender || null,
         yearsOfExperience: formData.yearsOfExperience ? parseInt(formData.yearsOfExperience, 10) : null,
         roleId: formData.roleId ? parseInt(formData.roleId, 10) : undefined,
-        clinicBranchId: formData.clinicBranchId ? parseInt(formData.clinicBranchId, 10) : undefined,
+        clinicBranchId: clinicBranchIds[0],
       });
+
+      const createdStaff = unwrapData(response);
+      const createdStaffId =
+        createdStaff.id ||
+        createdStaff.staff?.id ||
+        response?.id ||
+        response?.data?.id ||
+        response?.data?.staff?.id;
+
+      if (clinicBranchIds.length > 1 && !createdStaffId) {
+        throw new Error('Staff was created, but the response did not include an id for branch assignments.');
+      }
+
+      if (clinicBranchIds.length > 1) {
+        await adminClinicStaffService.updateClinicStaffAssignments(createdStaffId, clinicBranchIds);
+      }
+
       setIsCreateModalOpen(false);
       fetchStaff(currentPage, searchTerm);
     } catch (error) {
-      setFormErrors({ form: error.response?.data?.message || 'Failed to create staff member' });
+      setFormErrors({ form: error.response?.data?.message || error.message || 'Failed to create staff member' });
     } finally {
       setSubmitLoading(false);
     }
@@ -207,6 +356,7 @@ const ClinicStaff = () => {
     if (!validateEditForm()) return;
     setSubmitLoading(true);
     try {
+      const clinicBranchIds = selectedEditBranchIds.map((branchId) => parseInt(branchId, 10));
       await adminClinicStaffService.updateClinicStaff(selectedStaff.id, {
         firstName: editFormData.firstName,
         lastName: editFormData.lastName,
@@ -216,10 +366,11 @@ const ClinicStaff = () => {
           : null,
         roleId: editFormData.roleId ? parseInt(editFormData.roleId, 10) : undefined,
       });
+      await adminClinicStaffService.updateClinicStaffAssignments(selectedStaff.id, clinicBranchIds);
       setIsEditModalOpen(false);
       fetchStaff(currentPage, searchTerm);
     } catch (error) {
-      setFormErrors({ form: error.response?.data?.message || 'Failed to update staff member' });
+      setFormErrors({ form: error.response?.data?.message || error.message || 'Failed to update staff member' });
     } finally {
       setSubmitLoading(false);
     }
@@ -285,9 +436,9 @@ const ClinicStaff = () => {
           placeholder="Short bio..." className={styles.textarea} rows={2} />
       </div>
 
-      {/* Cascading clinic → branch */}
+      {/* Cascading clinic → branches */}
       <div className={styles.branchSection}>
-        <label className={styles.label}>Assign to Branch</label>
+        <label className={styles.label}>Assign to Branches</label>
         <select
           value={formData.selectedClinicId}
           onChange={(e) => handleClinicChange(e.target.value)}
@@ -305,19 +456,32 @@ const ClinicStaff = () => {
             ) : clinicBranches.length === 0 ? (
               <p className={styles.noBranchesText}>No branches found for this clinic.</p>
             ) : (
-              <select
-                name="clinicBranchId"
-                value={formData.clinicBranchId}
-                onChange={handleInputChange}
-                className={styles.select}
-              >
-                <option value="">-- Select Branch --</option>
+              <>
+                <div className={styles.branchCheckboxes}>
                 {clinicBranches.map((branch) => (
-                  <option key={branch.id} value={branch.id}>{branch.title}</option>
+                    <label key={getBranchId(branch)} className={styles.branchCheckbox}>
+                      <input
+                        type="checkbox"
+                        checked={formData.clinicBranchIds.includes(String(getBranchId(branch)))}
+                        onChange={() => toggleCreateBranch(getBranchId(branch))}
+                      />
+                      <span>{getBranchTitle(branch)}</span>
+                      {getBranchAddress(branch) && (
+                        <span className={styles.branchAddressHint}>{getBranchAddress(branch)}</span>
+                      )}
+                    </label>
                 ))}
-              </select>
+                </div>
+                <div className={styles.selectedBranchCount}>
+                  <i className="bi bi-check2-circle"></i>
+                  {formData.clinicBranchIds.length} selected
+                </div>
+              </>
             )}
           </>
+        )}
+        {formErrors.clinicBranchIds && (
+          <div className="invalid-feedback d-block">{formErrors.clinicBranchIds}</div>
         )}
       </div>
     </div>
@@ -353,6 +517,41 @@ const ClinicStaff = () => {
         <label className={styles.label}>Bio</label>
         <textarea name="bio" value={editFormData.bio} onChange={handleEditInputChange}
           placeholder="Short bio..." className={styles.textarea} rows={2} />
+      </div>
+      <div className={styles.branchSection}>
+        <label className={styles.label}>Assigned Branches</label>
+        {editBranchesLoading ? (
+          <div className={styles.branchLoadingText}><div className={styles.spinner}></div>Loading branches...</div>
+        ) : !selectedEditClinicId ? (
+          <p className={styles.noBranchesText}>No clinic found for this staff member.</p>
+        ) : editClinicBranches.length === 0 ? (
+          <p className={styles.noBranchesText}>No branches found for this clinic.</p>
+        ) : (
+          <>
+            <div className={styles.branchCheckboxes}>
+              {editClinicBranches.map((branch) => (
+                <label key={getBranchId(branch)} className={styles.branchCheckbox}>
+                  <input
+                    type="checkbox"
+                    checked={selectedEditBranchIds.includes(String(getBranchId(branch)))}
+                    onChange={() => toggleEditBranch(getBranchId(branch))}
+                  />
+                  <span>{getBranchTitle(branch)}</span>
+                  {getBranchAddress(branch) && (
+                    <span className={styles.branchAddressHint}>{getBranchAddress(branch)}</span>
+                  )}
+                </label>
+              ))}
+            </div>
+            <div className={styles.selectedBranchCount}>
+              <i className="bi bi-check2-circle"></i>
+              {selectedEditBranchIds.length} selected
+            </div>
+          </>
+        )}
+        {formErrors.clinicBranchIds && (
+          <div className="invalid-feedback d-block">{formErrors.clinicBranchIds}</div>
+        )}
       </div>
     </div>
   );
