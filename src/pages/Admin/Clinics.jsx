@@ -295,7 +295,7 @@ const Clinics = () => {
       address: branch.address || '',
       phoneNumber: branch.phoneNumber || '',
       isMainBranch: branch.isMainBranch || false,
-      serviceIds: (branch.services || []).map((s) => s.id),
+      serviceIds: (branch.services || []).map((s) => s.clinicServiceId),
     });
     setBranchFormErrors({});
     setIsEditBranchModalOpen(true);
@@ -353,7 +353,7 @@ const Clinics = () => {
         phoneNumber: branchFormData.phoneNumber || null,
         isMainBranch: branchFormData.isMainBranch,
         isActive: true,
-        serviceIds: branchFormData.serviceIds,
+        services: branchFormData.serviceIds.map((id) => ({ clinicServiceId: id, cost: 0 })),
         tags: [],
         workingHours: [],
       });
@@ -378,7 +378,10 @@ const Clinics = () => {
         phoneNumber: branchFormData.phoneNumber || null,
         isMainBranch: branchFormData.isMainBranch,
         isActive: true,
-        serviceIds: branchFormData.serviceIds,
+        services: branchFormData.serviceIds.map((id) => {
+          const existing = (selectedBranch.services || []).find((s) => s.clinicServiceId === id);
+          return { clinicServiceId: id, cost: existing?.cost ?? 0 };
+        }),
         tags: [],
         workingHours: [],
       });

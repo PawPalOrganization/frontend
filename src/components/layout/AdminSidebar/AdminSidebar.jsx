@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../../../context/AdminAuthContext';
 import styles from './AdminSidebar.module.scss';
-import logoPawBuddy from '../../../assets/images/login/Logo Paw Buddy.png';
+import pawpalLogo from '../../../assets/images/pawpal-logo.png';
 
 const AdminSidebar = ({ isOpen = false, onClose = () => {} }) => {
   const { admin, logout } = useAdminAuth();
@@ -50,7 +50,8 @@ const AdminSidebar = ({ isOpen = false, onClose = () => {} }) => {
 
       {/* Logo */}
       <div className={styles.logo}>
-        <img src={logoPawBuddy} alt="Paw Buddy" className={styles.logoImage} />
+        <img src={pawpalLogo} alt="PawPal" className={styles.logoImage} />
+        <span className={styles.logoText}>PawPal</span>
       </div>
 
       {/* Main Navigation */}

@@ -56,13 +56,26 @@
 
 // Logo section
 .logo {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
   padding: 1.25rem 1.25rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .logoImage {
-  width: 100%;
-  max-width: 110px;
+  width: 2rem;
+  height: 2rem;
+  object-fit: contain;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.logoText {
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.02em;
 }
 
 // Navigation

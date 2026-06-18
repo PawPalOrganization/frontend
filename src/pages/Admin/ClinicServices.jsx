@@ -181,14 +181,24 @@ const ClinicServices = () => {
 
   const columns = [
     {
+      key: 'id',
+      label: 'ID',
+      width: '8%',
+      render: (row) => (
+        <span style={{ fontFamily: 'monospace', fontWeight: 600, color: '#0D9AFF' }}>
+          #{row.id}
+        </span>
+      ),
+    },
+    {
       key: 'name',
       label: 'Name',
-      width: '25%',
+      width: '22%',
     },
     {
       key: 'description',
       label: 'Description',
-      width: '45%',
+      width: '37%',
       render: (row) =>
         row.description ? (
           <span className={styles.descriptionCell}>{row.description}</span>
