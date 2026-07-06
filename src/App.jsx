@@ -1,24 +1,37 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AdminAuthProvider } from './context/AdminAuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import AdminLayout from './components/layout/AdminLayout/AdminLayout';
+import PawLoader from './components/common/PawLoader/PawLoader';
+
+// Static imports — needed immediately, before any route-based code splitting matters
 import Login from './pages/Login/Login';
 import Dashboard from './pages/Admin/Dashboard';
-import Users from './pages/Admin/Users';
-import Pets from './pages/Admin/Pets';
-import PetTypes from './pages/Admin/PetTypes';
-import PetTypeBreeds from './pages/Admin/PetTypeBreeds';
-import Admins from './pages/Admin/Admins';
-import Notifications from './pages/Admin/Notifications';
-import UserRoles from './pages/Admin/UserRoles';
-import Emails from './pages/Admin/Emails';
-import Clinics from './pages/Admin/Clinics';
-import ClinicServices from './pages/Admin/ClinicServices';
-import ClinicStaff from './pages/Admin/ClinicStaff';
-import ClinicStaffRoles from './pages/Admin/ClinicStaffRoles';
 
+// Lazy page chunks — each becomes its own JS file, loaded only when navigated to
+const Users = lazy(() => import('./pages/Admin/Users'));
+const Pets = lazy(() => import('./pages/Admin/Pets'));
+const PetTypes = lazy(() => import('./pages/Admin/PetTypes'));
+const PetTypeBreeds = lazy(() => import('./pages/Admin/PetTypeBreeds'));
+const Admins = lazy(() => import('./pages/Admin/Admins'));
+const Notifications = lazy(() => import('./pages/Admin/Notifications'));
+const UserRoles = lazy(() => import('./pages/Admin/UserRoles'));
+const Emails = lazy(() => import('./pages/Admin/Emails'));
+const Clinics = lazy(() => import('./pages/Admin/Clinics'));
+const ClinicServices = lazy(() => import('./pages/Admin/ClinicServices'));
+const ClinicStaff = lazy(() => import('./pages/Admin/ClinicStaff'));
+const ClinicStaffRoles = lazy(() => import('./pages/Admin/ClinicStaffRoles'));
+const DataShareTester = lazy(() => import('./pages/Admin/DataShareTester'));
 const AppSettings = lazy(() => import('./pages/Admin/AppSettings'));
+
+function RouteLoadingFallback() {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+      <PawLoader size="large" />
+    </div>
+  );
+}
 
 function App() {
   return (
@@ -38,23 +51,27 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<Navigate to="/admin/dashboard" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="users" element={<Users />} />
-            <Route path="pets" element={<Pets />} />
-            <Route path="pet-types" element={<PetTypes />} />
-            <Route path="pet-type-breeds" element={<PetTypeBreeds />} />
-            <Route path="admins" element={<Admins />} />
-            <Route path="notifications" element={<Notifications />} />
-            <Route path="user-roles" element={<UserRoles />} />
-            <Route path="emails" element={<Emails />} />
-            <Route path="clinics" element={<Clinics />} />
-            <Route path="clinic-services" element={<ClinicServices />} />
-            <Route path="clinic-staff" element={<ClinicStaff />} />
-            <Route path="clinic-staff-roles" element={<ClinicStaffRoles />} />
-            <Route path="app-settings" element={<Suspense fallback={null}><AppSettings /></Suspense>} />
-            <Route path="account" element={<div>Account Settings</div>} />
-            <Route path="settings" element={<div>Settings</div>} />
+            {/* Suspense wrapper — shows a loader while any lazy page chunk loads */}
+            <Route element={<Suspense fallback={<RouteLoadingFallback />}><Outlet /></Suspense>}>
+              <Route index element={<Navigate to="/admin/dashboard" replace />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="users" element={<Users />} />
+              <Route path="pets" element={<Pets />} />
+              <Route path="pet-types" element={<PetTypes />} />
+              <Route path="pet-type-breeds" element={<PetTypeBreeds />} />
+              <Route path="admins" element={<Admins />} />
+              <Route path="notifications" element={<Notifications />} />
+              <Route path="user-roles" element={<UserRoles />} />
+              <Route path="emails" element={<Emails />} />
+              <Route path="clinics" element={<Clinics />} />
+              <Route path="clinic-services" element={<ClinicServices />} />
+              <Route path="clinic-staff" element={<ClinicStaff />} />
+              <Route path="clinic-staff-roles" element={<ClinicStaffRoles />} />
+              <Route path="data-share-tester" element={<DataShareTester />} />
+              <Route path="app-settings" element={<AppSettings />} />
+              <Route path="account" element={<div>Account Settings</div>} />
+              <Route path="settings" element={<div>Settings</div>} />
+            </Route>
           </Route>
         </Routes>
       </Router>

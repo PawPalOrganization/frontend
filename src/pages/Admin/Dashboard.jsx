@@ -84,7 +84,7 @@ const Dashboard = () => {
   return (
     <div className={styles.dashboard}>
       <h1 className={styles.title}>Dashboard</h1>
-      <p className={styles.subtitle}>Welcome to the Paw Buddy Admin Panel</p>
+      <p className={styles.subtitle}>Welcome to the Paw-Pal Admin Panel</p>
 
       {/* Stats Cards */}
       <div className={styles.statsGrid}>

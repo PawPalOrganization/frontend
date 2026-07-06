@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 import styles from './Login.module.scss';
 import PawLoader from '../../components/common/PawLoader/PawLoader';
-import logoPawBuddy from '../../assets/images/login/Logo Paw Buddy.png';
+import logoPawPal from '../../assets/images/login/Logo Paw Pal.png';
 import dogImage from '../../assets/images/login/dog.png';
 
 const Login = () => {
@@ -95,8 +95,8 @@ const Login = () => {
             {/* Logo */}
             <div className={styles.logo}>
               <img
-                src={logoPawBuddy}
-                alt="Paw Buddy Logo"
+                src={logoPawPal}
+                alt="Paw-Pal Logo"
                 style={{ maxWidth: '150px' }}
                 className="img-fluid"
               />

@@ -438,7 +438,7 @@ const ClinicStaff = () => {
 
       {/* Cascading clinic → branches */}
       <div className={styles.branchSection}>
-        <label className={styles.label}>Assign to Branches</label>
+        <label className={styles.label}>Assign to Clinics</label>
         <select
           value={formData.selectedClinicId}
           onChange={(e) => handleClinicChange(e.target.value)}

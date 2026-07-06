@@ -1,4 +1,4 @@
-# Paw Buddy - Project Structure
+# Paw-Pal - Project Structure
 
 ## Overview
 Pet management application built with React + Vite + Bootstrap

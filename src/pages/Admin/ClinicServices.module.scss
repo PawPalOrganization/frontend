@@ -38,7 +38,11 @@
 }
 
 .searchBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 24px;
+  flex-wrap: wrap;
 }
 
 .searchWrapper {
@@ -137,4 +141,100 @@
   font-size: 13px;
   color: #495057;
   line-height: 1.4;
+}
+
+/* ── Scope filter select ── */
+.scopeSelect {
+  padding: 10px 14px;
+  border: 1px solid #DEE2E6;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #2C3E50;
+  background: #fff;
+  cursor: pointer;
+  min-width: 160px;
+  transition: border-color 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #0D9AFF;
+    box-shadow: 0 0 0 3px rgba(13, 154, 255, 0.1);
+  }
+
+  &:disabled {
+    background: #F8F9FA;
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+/* ── isPlatform badge ── */
+.platformBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(13, 154, 255, 0.1);
+  color: #0D9AFF;
+  vertical-align: middle;
+}
+
+/* ── Owner column ── */
+.ownerPlatform {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0D9AFF;
+  background: rgba(13, 154, 255, 0.08);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.ownerClinic {
+  font-size: 12px;
+  font-weight: 600;
+  color: #28A745;
+  background: rgba(40, 167, 69, 0.08);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* ── Platform / Clinic-Specific toggle in create form ── */
+.typeToggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.typeBtn {
+  flex: 1;
+  padding: 9px 12px;
+  border: 1.5px solid #DEE2E6;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6C757D;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: #0D9AFF;
+    color: #0D9AFF;
+  }
+}
+
+.typeBtnActive {
+  border-color: #0D9AFF;
+  background: rgba(13, 154, 255, 0.08);
+  color: #0D9AFF;
+  font-weight: 600;
 }

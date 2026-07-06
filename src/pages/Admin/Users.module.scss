@@ -112,6 +112,19 @@
   color: #E91E8C;
 }
 
+.hashBadge {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #7F8C8D;
+  background: #F5F5F5;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.noData {
+  color: #ADB5BD;
+}
+
 .form {
   display: flex;
   flex-direction: column;

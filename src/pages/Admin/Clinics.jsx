@@ -171,6 +171,10 @@ const Clinics = () => {
         website: formData.website || null,
         logoUrl: formData.logoUrl || null,
         license: formData.license || null,
+        // Explicit tri-state default — a brand-new clinic is awaiting review,
+        // not rejected. Without this, the backend's column default determines
+        // the initial status, which may not be `null`.
+        approved: null,
       });
       setIsCreateModalOpen(false);
       fetchClinics(currentPage, searchTerm);

@@ -8,6 +8,16 @@ import Input from '../../components/common/Input/Input';
 import TablePageSkeleton from '../../components/common/Skeleton/TablePageSkeleton';
 import styles from './Users.module.scss';
 
+// Accepts a plain local number (exactly 11 digits, e.g. 01012345678) or an
+// international number with a country code (e.g. +201012345678).
+const isValidPhoneNumber = (value) => {
+  const trimmed = value.trim();
+  if (trimmed.startsWith('+')) {
+    return /^\+\d{10,15}$/.test(trimmed);
+  }
+  return /^\d{11}$/.test(trimmed);
+};
+
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,6 +42,7 @@ const Users = () => {
     email: '',
     phoneNumber: '',
     password: '',
+    confirmPassword: '',
     birthDate: '',
     gender: 'male',
     userRoleId: '',
@@ -94,6 +105,7 @@ const Users = () => {
       email: '',
       phoneNumber: '',
       password: '',
+      confirmPassword: '',
       birthDate: '',
       gender: 'male',
       userRoleId: '',
@@ -111,6 +123,7 @@ const Users = () => {
       email: user.email || '',
       phoneNumber: user.phoneNumber || '',
       password: '', // Don't pre-fill password
+      confirmPassword: '',
       birthDate: user.birthDate ? user.birthDate.split('T')[0] : '',
       gender: user.gender || 'male',
       userRoleId: user.userRoleId || user.userRole?.id || '',
@@ -147,10 +160,25 @@ const Users = () => {
       errors.password = 'Password is required';
     } else if (!isEdit && formData.password.length < 6) {
       errors.password = 'Password must be at least 6 characters';
+    } else if (isEdit && formData.password && formData.password.length < 6) {
+      errors.password = 'Password must be at least 6 characters';
+    }
+
+    // Confirm password is required whenever a password is being set — always on
+    // create, and on edit only if the admin is actually changing the password.
+    const isSettingPassword = !isEdit || !!formData.password;
+    if (isSettingPassword) {
+      if (!formData.confirmPassword) {
+        errors.confirmPassword = 'Confirm password is required';
+      } else if (formData.confirmPassword !== formData.password) {
+        errors.confirmPassword = 'Passwords do not match';
+      }
     }
 
     if (!formData.phoneNumber.trim()) {
       errors.phoneNumber = 'Phone number is required';
+    } else if (!isValidPhoneNumber(formData.phoneNumber)) {
+      errors.phoneNumber = 'Enter an 11-digit phone number, or include a country code (e.g. +20xxxxxxxxxx)';
     }
 
     if (!formData.birthDate) {
@@ -206,6 +234,7 @@ const Users = () => {
       // Remove password if empty (don't update password)
       if (!updateData.password) {
         delete updateData.password;
+        delete updateData.confirmPassword;
       }
       // Include userRoleId as integer if set
       if (updateData.userRoleId) {
@@ -243,22 +272,33 @@ const Users = () => {
     {
       key: 'firstName',
       label: 'First Name',
-      width: '15%',
+      width: '13%',
     },
     {
       key: 'lastName',
       label: 'Last Name',
-      width: '15%',
+      width: '13%',
     },
     {
       key: 'email',
       label: 'Email',
-      width: '25%',
+      width: '20%',
     },
     {
       key: 'phoneNumber',
       label: 'Phone',
-      width: '15%',
+      width: '13%',
+    },
+    {
+      key: 'userHash',
+      label: 'User Hash',
+      width: '13%',
+      render: (row) =>
+        row.userHash ? (
+          <span className={styles.hashBadge}>{row.userHash}</span>
+        ) : (
+          <span className={styles.noData}>—</span>
+        ),
     },
     {
       key: 'gender',
@@ -277,7 +317,7 @@ const Users = () => {
     {
       key: 'createdAt',
       label: 'Joined',
-      width: '15%',
+      width: '13%',
       render: (row) => new Date(row.createdAt).toLocaleDateString(),
     },
   ];
@@ -316,7 +356,7 @@ const Users = () => {
 
       {/* Data Table */}
       {loading ? (
-        <TablePageSkeleton columns={6} rows={8} />
+        <TablePageSkeleton columns={7} rows={8} />
       ) : (
         <DataTable
           columns={columns}
@@ -402,7 +442,7 @@ const Users = () => {
             value={formData.phoneNumber}
             onChange={handleInputChange}
             error={formErrors.phoneNumber}
-            placeholder="+1234567890"
+            placeholder="01012345678 or +201012345678"
             icon="bi-telephone"
             required
           />
@@ -415,6 +455,18 @@ const Users = () => {
             onChange={handleInputChange}
             error={formErrors.password}
             placeholder="Min 6 characters"
+            icon="bi-lock"
+            required
+          />
+
+          <Input
+            label="Confirm Password"
+            type="password"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleInputChange}
+            error={formErrors.confirmPassword}
+            placeholder="Re-enter password"
             icon="bi-lock"
             required
           />
@@ -540,7 +592,7 @@ const Users = () => {
             value={formData.phoneNumber}
             onChange={handleInputChange}
             error={formErrors.phoneNumber}
-            placeholder="+1234567890"
+            placeholder="01012345678 or +201012345678"
             icon="bi-telephone"
             required
           />
@@ -555,6 +607,20 @@ const Users = () => {
             placeholder="Leave empty to keep current password"
             icon="bi-lock"
           />
+
+          {formData.password && (
+            <Input
+              label="Confirm Password"
+              type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleInputChange}
+              error={formErrors.confirmPassword}
+              placeholder="Re-enter new password"
+              icon="bi-lock"
+              required
+            />
+          )}
 
           <div className={styles.formRow}>
             <Input

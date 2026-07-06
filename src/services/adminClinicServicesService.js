@@ -1,14 +1,17 @@
 import adminApi from './adminApi';
 
 const adminClinicServicesService = {
-  async getAllClinicServices(page = 1, limit = 10, search = '') {
+  async getAllClinicServices(page = 1, limit = 10, search = '', scope = 'all', clinicId = '') {
     const params = { page, limit };
     if (search) params.search = search;
+    if (scope && scope !== 'all') params.scope = scope;
+    if (clinicId) params.clinicId = clinicId;
     const response = await adminApi.get('/clinic-services', { params });
     return response.data;
   },
 
   async createClinicService(data) {
+    // data may include clinicId (null for platform, number for clinic-specific)
     const response = await adminApi.post('/clinic-services', data);
     return response.data;
   },
