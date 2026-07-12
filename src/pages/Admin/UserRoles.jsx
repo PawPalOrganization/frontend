@@ -61,7 +61,7 @@ const UserRoles = () => {
       const response = await adminPermissionsService.getAllPermissions();
       // API may return { data: [...] } or just an array
       setAllPermissions(response.data || response || []);
-    } catch (error) {
+    } catch {
       // Error fetching permissions
     }
   };

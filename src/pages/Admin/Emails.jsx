@@ -54,7 +54,7 @@ const Emails = () => {
         if (emailSetting) {
           setEmailsEnabled(String(emailSetting.value?.value) === 'true');
         }
-      } catch (error) {
+      } catch {
         // silently continue — page remains functional
       }
     };

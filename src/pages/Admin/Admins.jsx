@@ -40,7 +40,7 @@ const Admins = () => {
       setTotalPages(response.meta?.totalPages || 1);
       setTotalItems(response.meta?.total || 0);
       setCurrentPage(page);
-    } catch (error) {
+    } catch {
       // Error fetching admins
     } finally {
       setLoading(false);
@@ -177,7 +177,7 @@ const Admins = () => {
       await adminAdminsService.deleteAdmin(selectedAdmin.id);
       setIsDeleteModalOpen(false);
       fetchAdmins(currentPage, searchTerm);
-    } catch (error) {
+    } catch {
       alert('Failed to delete admin');
     } finally {
       setSubmitLoading(false);

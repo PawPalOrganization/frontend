@@ -1,9 +1,10 @@
 import adminApi from './adminApi';
 
 const adminClinicStaffService = {
-  async getAllClinicStaff(page = 1, limit = 10, search = '') {
+  async getAllClinicStaff(page = 1, limit = 10, search = '', clinicId = '') {
     const params = { page, limit };
     if (search) params.search = search;
+    if (clinicId) params.clinicId = clinicId;
     const response = await adminApi.get('/clinic-staff', { params });
     return response.data;
   },

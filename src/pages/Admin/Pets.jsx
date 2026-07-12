@@ -61,7 +61,7 @@ const Pets = () => {
       setTotalPages(response.meta?.totalPages || 1);
       setTotalItems(response.meta?.total || 0);
       setCurrentPage(page);
-    } catch (error) {
+    } catch {
       // Error fetching pets
     } finally {
       setLoading(false);
@@ -73,7 +73,7 @@ const Pets = () => {
     try {
       const response = await adminUsersService.getUsersForDropdown();
       setUsers(response.data || []);
-    } catch (error) {
+    } catch {
       // Error fetching users
     }
   };
@@ -83,7 +83,7 @@ const Pets = () => {
     try {
       const response = await adminPetTypesService.getAllPetTypes(1, 100);
       setPetTypes(response.data || []);
-    } catch (error) {
+    } catch {
       // Error fetching pet types
     }
   };
@@ -97,7 +97,7 @@ const Pets = () => {
     try {
       const response = await adminPetTypeBreedsService.getAllPetTypeBreeds(1, 100, petTypeId);
       setBreeds(response.data || []);
-    } catch (error) {
+    } catch {
       // Error fetching breeds
     }
   };

@@ -19,7 +19,7 @@ export const AdminAuthProvider = ({ children }) => {
           setAdmin(currentAdmin);
           setIsAuthenticated(true);
         }
-      } catch (error) {
+      } catch {
         // Auth check failed - silently continue
       } finally {
         setLoading(false);

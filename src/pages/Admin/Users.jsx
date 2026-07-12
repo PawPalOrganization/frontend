@@ -60,7 +60,7 @@ const Users = () => {
       setTotalPages(response.meta?.totalPages || 1);
       setTotalItems(response.meta?.total || 0);
       setCurrentPage(page);
-    } catch (error) {
+    } catch {
       // Error fetching users
     } finally {
       setLoading(false);
@@ -72,7 +72,7 @@ const Users = () => {
     try {
       const response = await adminUserRolesService.getAllUserRoles(1, 100);
       setUserRoles(response.data || []);
-    } catch (error) {
+    } catch {
       // Error fetching user roles
     }
   };
@@ -260,7 +260,7 @@ const Users = () => {
       await adminUsersService.deleteUser(selectedUser.id);
       setIsDeleteModalOpen(false);
       fetchUsers(currentPage, searchTerm);
-    } catch (error) {
+    } catch {
       alert('Failed to delete user');
     } finally {
       setSubmitLoading(false);

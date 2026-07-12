@@ -41,9 +41,44 @@
   margin-bottom: 24px;
 }
 
+.filterRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  @media (max-width: 991px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.filterSelect {
+  padding: 12px 14px;
+  border: 1px solid #DEE2E6;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #2C3E50;
+  background: white;
+  cursor: pointer;
+  min-width: 180px;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #0D9AFF;
+    box-shadow: 0 0 0 3px rgba(13, 154, 255, 0.1);
+  }
+
+  &:disabled {
+    background: #F8F9FA;
+    cursor: not-allowed;
+  }
+}
+
 .searchWrapper {
   position: relative;
   max-width: 400px;
+  flex: 1;
 
   @media (max-width: 991px) {
     max-width: 100%;

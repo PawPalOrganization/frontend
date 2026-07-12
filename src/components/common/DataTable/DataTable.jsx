@@ -3,7 +3,6 @@ import styles from './DataTable.module.scss';
 const DataTable = ({
   columns,
   data,
-  loading,
   currentPage,
   totalPages,
   totalItems,

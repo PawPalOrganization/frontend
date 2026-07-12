@@ -81,6 +81,7 @@ const ClinicStaff = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterClinicId, setFilterClinicId] = useState('');
   const [fetchError, setFetchError] = useState('');
   const searchTimerRef = useRef(null);
 
@@ -108,15 +109,35 @@ const ClinicStaff = () => {
   const [deleteError, setDeleteError] = useState('');
 
   // ── Fetch staff ───────────────────────────────────────────────────────────
-  const fetchStaff = async (page = 1, search = '') => {
+  // The backend's `/clinic-staff` list endpoint doesn't filter by clinicId (staff are
+  // only related to a clinic indirectly through their branch), so when a clinic filter
+  // is active we fetch a large batch and filter/paginate client-side using the same
+  // branches -> clinic derivation already used for the edit modal (getMemberClinicId).
+  const fetchStaff = async (page = 1, clinicId = '', search = '') => {
     setLoading(true);
     setFetchError('');
     try {
-      const response = await adminClinicStaffService.getAllClinicStaff(page, 10, search);
-      setStaff(response.data || []);
-      setTotalPages(response.meta?.totalPages || 1);
-      setTotalItems(response.meta?.total || 0);
-      setCurrentPage(page);
+      if (clinicId) {
+        const response = await adminClinicStaffService.getAllClinicStaff(1, 1000, search, '');
+        const matching = (response.data || []).filter(
+          (member) => String(getMemberClinicId(member)) === String(clinicId)
+        );
+        const limit = 10;
+        const total = matching.length;
+        const totalPagesCalc = Math.max(1, Math.ceil(total / limit));
+        const safePage = Math.min(page, totalPagesCalc);
+        const startIdx = (safePage - 1) * limit;
+        setStaff(matching.slice(startIdx, startIdx + limit));
+        setTotalPages(totalPagesCalc);
+        setTotalItems(total);
+        setCurrentPage(safePage);
+      } else {
+        const response = await adminClinicStaffService.getAllClinicStaff(page, 10, search, '');
+        setStaff(response.data || []);
+        setTotalPages(response.meta?.totalPages || 1);
+        setTotalItems(response.meta?.total || 0);
+        setCurrentPage(page);
+      }
     } catch (error) {
       setFetchError(error.response?.data?.message || 'Failed to load clinic staff.');
     } finally {
@@ -138,7 +159,7 @@ const ClinicStaff = () => {
   };
 
   useEffect(() => {
-    fetchStaff(1, '');
+    fetchStaff(1, '', '');
     fetchLookupData();
   }, []);
 
@@ -146,10 +167,16 @@ const ClinicStaff = () => {
     const value = e.target.value;
     setSearchTerm(value);
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
-    searchTimerRef.current = setTimeout(() => fetchStaff(1, value), 600);
+    searchTimerRef.current = setTimeout(() => fetchStaff(1, filterClinicId, value), 600);
   };
 
-  const handlePageChange = (page) => fetchStaff(page, searchTerm);
+  const handleFilterChange = (e) => {
+    const value = e.target.value;
+    setFilterClinicId(value);
+    fetchStaff(1, value, searchTerm);
+  };
+
+  const handlePageChange = (page) => fetchStaff(page, filterClinicId, searchTerm);
 
   // ── Cascading clinic → branches ───────────────────────────────────────────
   const handleClinicChange = async (clinicId) => {
@@ -344,7 +371,7 @@ const ClinicStaff = () => {
       }
 
       setIsCreateModalOpen(false);
-      fetchStaff(currentPage, searchTerm);
+      fetchStaff(currentPage, filterClinicId, searchTerm);
     } catch (error) {
       setFormErrors({ form: error.response?.data?.message || error.message || 'Failed to create staff member' });
     } finally {
@@ -368,7 +395,7 @@ const ClinicStaff = () => {
       });
       await adminClinicStaffService.updateClinicStaffAssignments(selectedStaff.id, clinicBranchIds);
       setIsEditModalOpen(false);
-      fetchStaff(currentPage, searchTerm);
+      fetchStaff(currentPage, filterClinicId, searchTerm);
     } catch (error) {
       setFormErrors({ form: error.response?.data?.message || error.message || 'Failed to update staff member' });
     } finally {
@@ -382,7 +409,7 @@ const ClinicStaff = () => {
     try {
       await adminClinicStaffService.deleteClinicStaff(selectedStaff.id);
       setIsDeleteModalOpen(false);
-      fetchStaff(currentPage, searchTerm);
+      fetchStaff(currentPage, filterClinicId, searchTerm);
     } catch (error) {
       setDeleteError(error.response?.data?.message || 'Failed to delete staff member.');
     } finally {
@@ -616,10 +643,23 @@ const ClinicStaff = () => {
       </div>
 
       <div className={styles.searchBar}>
-        <div className={styles.searchWrapper}>
-          <i className="bi bi-search"></i>
-          <input type="text" placeholder="Search staff..." value={searchTerm}
-            onChange={handleSearch} className={styles.searchInput} disabled={loading} />
+        <div className={styles.filterRow}>
+          <div className={styles.searchWrapper}>
+            <i className="bi bi-search"></i>
+            <input type="text" placeholder="Search staff..." value={searchTerm}
+              onChange={handleSearch} className={styles.searchInput} disabled={loading} />
+          </div>
+          <select
+            value={filterClinicId}
+            onChange={handleFilterChange}
+            className={styles.filterSelect}
+            disabled={loading}
+          >
+            <option value="">All Clinics</option>
+            {allClinics.map((clinic) => (
+              <option key={clinic.id} value={clinic.id}>{clinic.title}</option>
+            ))}
+          </select>
         </div>
       </div>
 

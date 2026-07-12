@@ -46,7 +46,7 @@ const PetTypeBreeds = () => {
       setTotalPages(response.meta?.totalPages || 1);
       setTotalItems(response.meta?.total || 0);
       setCurrentPage(page);
-    } catch (error) {
+    } catch {
       // Error fetching breeds
     } finally {
       setLoading(false);
@@ -58,7 +58,7 @@ const PetTypeBreeds = () => {
     try {
       const response = await adminPetTypesService.getAllPetTypes(1, 100);
       setPetTypes(response.data || []);
-    } catch (error) {
+    } catch {
       // Error fetching pet types
     }
   };
