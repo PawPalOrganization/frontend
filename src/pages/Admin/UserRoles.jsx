@@ -67,7 +67,7 @@ const UserRoles = () => {
   };
 
   useEffect(() => {
-    fetchRoles(1, searchTerm);
+    fetchRoles(1, '');
     fetchPermissions();
   }, []);
 

@@ -103,7 +103,7 @@ const Pets = () => {
   };
 
   useEffect(() => {
-    fetchPets(1, searchTerm);
+    fetchPets(1, '');
     fetchUsers();
     fetchPetTypes();
   }, []);

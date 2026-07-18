@@ -48,7 +48,7 @@ const Admins = () => {
   };
 
   useEffect(() => {
-    fetchAdmins(1, searchTerm);
+    fetchAdmins(1, '');
   }, []);
 
   // Handle search with debounce

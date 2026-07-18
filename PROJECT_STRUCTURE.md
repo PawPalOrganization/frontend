@@ -1,126 +1,74 @@
 # Paw-Pal - Project Structure
 
 ## Overview
-Pet management application built with React + Vite + Bootstrap
+Admin dashboard for the PawPal pet-care platform, built with React 19 + Vite + Bootstrap.
+This repo is admin-only — it manages users, pets, clinics, and system settings for the
+mobile app's backend. There is no consumer-facing mobile UI in this codebase.
 
 ## Folder Structure
 
 ```
 src/
 ├── components/
-│   ├── common/              # Reusable UI components
+│   ├── auth/
+│   │   └── ProtectedRoute.jsx        # Redirects to /login when not authenticated
+│   ├── common/                       # Reusable UI primitives
 │   │   ├── Button/
-│   │   │   ├── Button.jsx
-│   │   │   └── Button.module.css
 │   │   ├── Input/
-│   │   │   ├── Input.jsx
-│   │   │   └── Input.module.css
 │   │   ├── Modal/
-│   │   │   └── Modal.jsx
-│   │   ├── Card/
-│   │   │   └── Card.jsx
-│   │   ├── Avatar/
-│   │   │   └── Avatar.jsx
-│   │   ├── Slider/
-│   │   │   └── Slider.jsx
-│   │   ├── SelectionCard/
-│   │   │   └── SelectionCard.jsx
-│   │   ├── EmptyState/
-│   │   │   └── EmptyState.jsx
-│   │   └── QRCode/
-│   │       └── QRCode.jsx
-│   │
-│   ├── layout/              # Layout components
-│   │   ├── Sidebar/
-│   │   │   ├── Sidebar.jsx
-│   │   │   └── Sidebar.module.css
-│   │   ├── Header/
-│   │   │   ├── Header.jsx
-│   │   │   └── Header.module.css
-│   │   ├── MainLayout/
-│   │   │   └── MainLayout.jsx
-│   │   └── ProfileSwitcher/
-│   │       └── ProfileSwitcher.jsx
-│   │
-│   └── features/            # Feature-specific components
-│       ├── PetProfile/
-│       │   ├── PetProfileCard.jsx
-│       │   └── PetProfileCarousel.jsx
-│       ├── HealthCard/
-│       │   ├── HealthInfo.jsx
-│       │   ├── VaccineList.jsx
-│       │   └── InsuranceCard.jsx
-│       ├── Nutrition/
-│       │   ├── MealTracker.jsx
-│       │   └── RecipeCard.jsx
-│       └── Activities/
-│           ├── WalkTracker.jsx
-│           └── ActivityMap.jsx
+│   │   ├── DataTable/                # Generic table w/ pagination, search, row actions
+│   │   ├── PawLoader/                # Homegrown loading spinner
+│   │   └── Skeleton/                 # Skeleton, TablePageSkeleton, PageHeaderSkeleton
+│   └── layout/
+│       ├── AdminLayout/              # Sidebar + <Outlet/> shell, responsive breakpoint
+│       └── AdminSidebar/             # Nav links (hardcoded array), profile menu, logout
 │
-├── pages/                   # Page components (route level)
-│   ├── Onboarding/
-│   │   ├── Onboarding.jsx
-│   │   └── CreateAccount.jsx
+├── pages/
 │   ├── Login/
 │   │   └── Login.jsx
-│   ├── ValidationCode/
-│   │   └── ValidationCode.jsx
-│   ├── Dashboard/
-│   │   └── Dashboard.jsx
-│   ├── AddPetProfile/
-│   │   ├── AddPetProfile.jsx
-│   │   ├── steps/
-│   │   │   ├── BreedSelection.jsx
-│   │   │   ├── NameStep.jsx
-│   │   │   ├── SizeStep.jsx
-│   │   │   ├── WeightStep.jsx
-│   │   │   ├── ImportantDates.jsx
-│   │   │   └── Caretakers.jsx
-│   ├── ShareProfile/
-│   │   └── ShareProfile.jsx
-│   ├── HealthCard/
-│   │   └── HealthCard.jsx
-│   ├── Nutrition/
-│   │   └── Nutrition.jsx
-│   └── Activities/
-│       └── Activities.jsx
+│   └── Admin/                        # One file per management screen (all lazy-loaded
+│       │                             # except Dashboard — see App.jsx)
+│       ├── Dashboard.jsx
+│       ├── Users.jsx
+│       ├── Pets.jsx
+│       ├── PetTypes.jsx
+│       ├── PetTypeBreeds.jsx
+│       ├── Admins.jsx
+│       ├── UserRoles.jsx
+│       ├── Notifications.jsx
+│       ├── Emails.jsx                # ReactQuill WYSIWYG
+│       ├── AppSettings.jsx           # ReactQuill WYSIWYG, bulk PUT
+│       ├── Clinics.jsx               # + nested branch CRUD, approve/reject workflow
+│       ├── ClinicServices.jsx        # + nested service-category CRUD (Manage Categories)
+│       ├── ClinicStaff.jsx           # cascading clinic → branch assignment
+│       ├── ClinicStaffRoles.jsx      # permission picker
+│       └── DataShareTester.jsx       # dev/QA tool — hits the mobile app's API directly
 │
-├── hooks/                   # Custom React hooks
-│   ├── usePetProfile.js
-│   ├── useAuth.js
-│   └── useForm.js
+├── context/
+│   └── AdminAuthContext.jsx          # useAdminAuth() — admin, isAuthenticated, login, logout
 │
-├── context/                 # React Context providers
-│   ├── AuthContext.jsx
-│   ├── PetContext.jsx
-│   └── ThemeContext.jsx
+├── services/                         # One thin Axios wrapper per resource; each returns
+│   │                                 # response.data already unwrapped ({success,data,meta})
+│   ├── adminApi.js                   # Axios instance, bearer-token + 401 interceptors
+│   ├── adminAuthService.js
+│   └── admin*Service.js              # Users, Pets, PetTypes, PetTypeBreeds, Admins,
+│                                      # UserRoles, Permissions, Files, Notifications,
+│                                      # Emails, AppSettings, Clinics, ClinicServices,
+│                                      # ClinicServiceCategories, ClinicStaff, ClinicStaffRoles
 │
-├── services/                # API services
-│   ├── api.js
-│   ├── petService.js
-│   └── authService.js
+├── assets/images/                    # Login artwork, sidebar logo
 │
-├── utils/                   # Utility functions
-│   ├── validators.js
-│   ├── formatters.js
-│   └── helpers.js
-│
-├── assets/                  # Static assets
-│   ├── images/
-│   │   └── dog-placeholder.png
-│   └── icons/
-│       └── logo.svg
-│
-├── styles/                  # Global styles
-│   ├── variables.css
-│   ├── global.css
-│   └── theme.css
-│
-└── constants/               # Constants and configuration
-    ├── routes.js
-    ├── colors.js
-    └── config.js
+└── styles/
+    ├── variables.css                 # Design tokens (color/spacing/radius/shadow)
+    ├── global.css
+    ├── theme.css
+    └── transitions.css
 ```
+
+Every management page under `pages/Admin/` follows the same hand-rolled CRUD recipe:
+local `useState` for list/loading/pagination/search, a 600ms-debounced search box, a
+shared `renderFormFields()` used by both Create and Edit modals, and a dedicated Delete
+confirm modal that specifically catches HTTP 409 ("still referenced elsewhere") errors.
 
 ---
 

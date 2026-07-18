@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useAdminAuth } from '../../../context/AdminAuthContext';
+import { useAdminAuth } from '../../../context/useAdminAuth';
 import styles from './AdminSidebar.module.scss';
 import pawpalLogo from '../../../assets/images/pawpal-logo.png';
 

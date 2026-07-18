@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect } from 'react';
 import adminAuthService from '../services/adminAuthService';
 
 const AdminAuthContext = createContext(null);
@@ -64,15 +64,6 @@ export const AdminAuthProvider = ({ children }) => {
       {children}
     </AdminAuthContext.Provider>
   );
-};
-
-// Custom hook to use admin auth context
-export const useAdminAuth = () => {
-  const context = useContext(AdminAuthContext);
-  if (!context) {
-    throw new Error('useAdminAuth must be used within AdminAuthProvider');
-  }
-  return context;
 };
 
 export default AdminAuthContext;

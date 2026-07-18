@@ -64,7 +64,7 @@ const PetTypeBreeds = () => {
   };
 
   useEffect(() => {
-    fetchBreeds(1, filterPetTypeId, searchTerm);
+    fetchBreeds(1, '', '');
     fetchPetTypes();
   }, []);
 

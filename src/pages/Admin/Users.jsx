@@ -78,7 +78,7 @@ const Users = () => {
   };
 
   useEffect(() => {
-    fetchUsers(1, searchTerm);
+    fetchUsers(1, '');
     fetchUserRoles();
   }, []);
 

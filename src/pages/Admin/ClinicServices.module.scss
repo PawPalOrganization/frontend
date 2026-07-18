@@ -238,3 +238,341 @@
   color: #0D9AFF;
   font-weight: 600;
 }
+
+/* ── Header actions (Manage Categories + Add Service) ── */
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── Form layout helpers ── */
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #DEE2E6;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #2C3E50;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #0D9AFF;
+    box-shadow: 0 0 0 3px rgba(13, 154, 255, 0.1);
+  }
+
+  &:disabled {
+    background: #F8F9FA;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.selectError {
+  border-color: #E74C3C;
+}
+
+.errorText {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #E74C3C;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #495057;
+  cursor: pointer;
+
+  input[type='checkbox'] {
+    width: 16px;
+    height: 16px;
+    accent-color: #0D9AFF;
+    cursor: pointer;
+  }
+}
+
+/* ── Category picker (in service form) ── */
+.categoryPickerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+
+  .label {
+    margin-bottom: 0;
+  }
+}
+
+.manageCategoriesLink {
+  background: none;
+  border: none;
+  color: #0D9AFF;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.noCategoriesText {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: #ADB5BD;
+
+  button {
+    font-size: 12px;
+  }
+}
+
+/* ── Bilingual + category + home-service table cells ── */
+.arabicSubtext {
+  font-size: 11px;
+  color: #ADB5BD;
+  margin-top: 1px;
+}
+
+.arabicInline {
+  font-size: 12px;
+  color: #7F8C8D;
+  font-weight: 400;
+}
+
+.categoryBadge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #EDE7F6;
+  color: #4527A0;
+  white-space: nowrap;
+}
+
+.homeServiceYes {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1B5E20;
+
+  i {
+    font-size: 13px;
+  }
+}
+
+.homeServiceNo {
+  font-size: 12px;
+  color: #ADB5BD;
+}
+
+/* ── Manage Categories modal ── */
+.categoriesModalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.categoriesModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.categoriesSearchWrapper {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+
+  i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #7F8C8D;
+    font-size: 14px;
+  }
+}
+
+.categoriesSearchInput {
+  width: 100%;
+  padding: 9px 14px 9px 38px;
+  border: 1px solid #DEE2E6;
+  border-radius: 8px;
+  font-size: 13px;
+
+  &:focus {
+    outline: none;
+    border-color: #0D9AFF;
+    box-shadow: 0 0 0 3px rgba(13, 154, 255, 0.1);
+  }
+}
+
+.categoryThumb {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+/* ── Shared list-modal styles (categories reuse the same visual language as Clinics' branches modal) ── */
+.branchesLoading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px;
+  color: #7F8C8D;
+  font-size: 14px;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #DEE2E6;
+  border-top-color: #0D9AFF;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.branchesEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  color: #ADB5BD;
+  gap: 12px;
+
+  i {
+    font-size: 2.5rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
+.branchesList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.branchCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border: 1px solid #DEE2E6;
+  border-radius: 10px;
+  background: #FAFBFC;
+  gap: 12px;
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: #0D9AFF;
+  }
+}
+
+.branchInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.branchName {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2C3E50;
+
+  i {
+    color: #7F8C8D;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+}
+
+.branchDetail {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #7F8C8D;
+}
+
+.branchActions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 13px;
+
+  i {
+    pointer-events: none;
+  }
+}
+
+.actionEdit {
+  background: #E3F2FD;
+  color: #1565C0;
+
+  &:hover {
+    background: #1565C0;
+    color: white;
+  }
+}
+
+.actionDelete {
+  background: #FFEBEE;
+  color: #B71C1C;
+
+  &:hover {
+    background: #B71C1C;
+    color: white;
+  }
+}

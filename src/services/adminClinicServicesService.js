@@ -1,11 +1,12 @@
 import adminApi from './adminApi';
 
 const adminClinicServicesService = {
-  async getAllClinicServices(page = 1, limit = 10, search = '', scope = 'all', clinicId = '') {
+  async getAllClinicServices(page = 1, limit = 10, search = '', scope = 'all', clinicId = '', categoryId = '') {
     const params = { page, limit };
     if (search) params.search = search;
     if (scope && scope !== 'all') params.scope = scope;
     if (clinicId) params.clinicId = clinicId;
+    if (categoryId) params.categoryId = categoryId;
     const response = await adminApi.get('/clinic-services', { params });
     return response.data;
   },

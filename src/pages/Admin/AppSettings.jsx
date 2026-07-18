@@ -62,7 +62,7 @@ const AppSettings = () => {
   };
 
   useEffect(() => {
-    fetchSettings(1, searchTerm);
+    fetchSettings(1, '');
   }, []);
 
   // Handle search with debounce

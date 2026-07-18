@@ -52,7 +52,7 @@ const PetTypes = () => {
   };
 
   useEffect(() => {
-    fetchPetTypes(1, searchTerm);
+    fetchPetTypes(1, '');
   }, []);
 
   // Handle search with debounce

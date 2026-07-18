@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAdminAuth } from '../../context/AdminAuthContext';
+import { useAdminAuth } from '../../context/useAdminAuth';
 import styles from './Login.module.scss';
 import PawLoader from '../../components/common/PawLoader/PawLoader';
 import logoPawPal from '../../assets/images/login/Logo Paw Pal.png';
