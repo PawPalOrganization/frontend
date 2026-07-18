@@ -30,8 +30,10 @@ const AdminSidebar = ({ isOpen = false, onClose = () => {} }) => {
     { path: '/admin/clinic-services', icon: 'bi-scissors', label: 'Clinic Services' },
     { path: '/admin/clinic-staff', icon: 'bi-person-badge', label: 'Clinic Staff' },
     { path: '/admin/clinic-staff-roles', icon: 'bi-shield-plus', label: 'Staff Roles' },
+    { path: '/admin/reviews', icon: 'bi-star', label: 'Reviews' },
     { divider: true, label: 'Testing' },
     { path: '/admin/data-share-tester', icon: 'bi-bug', label: 'Share Tester' },
+    { path: '/admin/review-tester', icon: 'bi-bug', label: 'Review Tester' },
   ];
 
   const handleNavClick = () => {

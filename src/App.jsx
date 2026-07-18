@@ -22,7 +22,9 @@ const Clinics = lazy(() => import('./pages/Admin/Clinics'));
 const ClinicServices = lazy(() => import('./pages/Admin/ClinicServices'));
 const ClinicStaff = lazy(() => import('./pages/Admin/ClinicStaff'));
 const ClinicStaffRoles = lazy(() => import('./pages/Admin/ClinicStaffRoles'));
+const Reviews = lazy(() => import('./pages/Admin/Reviews'));
 const DataShareTester = lazy(() => import('./pages/Admin/DataShareTester'));
+const ReviewTester = lazy(() => import('./pages/Admin/ReviewTester'));
 const AppSettings = lazy(() => import('./pages/Admin/AppSettings'));
 
 function RouteLoadingFallback() {
@@ -67,7 +69,9 @@ function App() {
               <Route path="clinic-services" element={<ClinicServices />} />
               <Route path="clinic-staff" element={<ClinicStaff />} />
               <Route path="clinic-staff-roles" element={<ClinicStaffRoles />} />
+              <Route path="reviews" element={<Reviews />} />
               <Route path="data-share-tester" element={<DataShareTester />} />
+              <Route path="review-tester" element={<ReviewTester />} />
               <Route path="app-settings" element={<AppSettings />} />
               <Route path="account" element={<div>Account Settings</div>} />
               <Route path="settings" element={<div>Settings</div>} />

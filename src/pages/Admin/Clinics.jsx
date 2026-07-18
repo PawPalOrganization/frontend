@@ -29,6 +29,7 @@ const EMPTY_CLINIC_FORM = {
   website: '',
   logoUrl: '',
   license: '',
+  reviewsEnabled: true,
 };
 
 const EMPTY_BRANCH_FORM = {
@@ -38,7 +39,10 @@ const EMPTY_BRANCH_FORM = {
   phoneNumber: '',
   isMainBranch: false,
   serviceIds: [],
+  reviewsEnabled: true,
 };
+
+const formatRating = (value) => (value == null ? '--' : Number(value).toFixed(1));
 
 const Clinics = () => {
   // ── Clinics list ──────────────────────────────────────────────────────────
@@ -135,6 +139,7 @@ const Clinics = () => {
       website: clinic.website || '',
       logoUrl: clinic.logoUrl || '',
       license: clinic.license || '',
+      reviewsEnabled: clinic.reviewsEnabled ?? true,
     });
     setFormErrors({});
     setIsEditModalOpen(true);
@@ -154,8 +159,8 @@ const Clinics = () => {
   };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     if (formErrors[name]) setFormErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
@@ -171,6 +176,7 @@ const Clinics = () => {
         website: formData.website || null,
         logoUrl: formData.logoUrl || null,
         license: formData.license || null,
+        reviewsEnabled: formData.reviewsEnabled,
         // Explicit tri-state default — a brand-new clinic is awaiting review,
         // not rejected. Without this, the backend's column default determines
         // the initial status, which may not be `null`.
@@ -197,6 +203,7 @@ const Clinics = () => {
         website: formData.website || null,
         logoUrl: formData.logoUrl || null,
         license: formData.license || null,
+        reviewsEnabled: formData.reviewsEnabled,
       });
       setIsEditModalOpen(false);
       fetchClinics(currentPage, searchTerm);
@@ -300,6 +307,7 @@ const Clinics = () => {
       phoneNumber: branch.phoneNumber || '',
       isMainBranch: branch.isMainBranch || false,
       serviceIds: (branch.services || []).map((s) => s.clinicServiceId),
+      reviewsEnabled: branch.reviewsEnabled ?? true,
     });
     setBranchFormErrors({});
     setIsEditBranchModalOpen(true);
@@ -357,6 +365,7 @@ const Clinics = () => {
         phoneNumber: branchFormData.phoneNumber || null,
         isMainBranch: branchFormData.isMainBranch,
         isActive: true,
+        reviewsEnabled: branchFormData.reviewsEnabled,
         services: branchFormData.serviceIds.map((id) => ({ clinicServiceId: id, cost: 0 })),
         tags: [],
         workingHours: [],
@@ -382,6 +391,7 @@ const Clinics = () => {
         phoneNumber: branchFormData.phoneNumber || null,
         isMainBranch: branchFormData.isMainBranch,
         isActive: true,
+        reviewsEnabled: branchFormData.reviewsEnabled,
         services: branchFormData.serviceIds.map((id) => {
           const existing = (selectedBranch.services || []).find((s) => s.clinicServiceId === id);
           return { clinicServiceId: id, cost: existing?.cost ?? 0 };
@@ -414,9 +424,21 @@ const Clinics = () => {
   };
 
   // ── Form renderers ────────────────────────────────────────────────────────
-  const renderClinicFormFields = () => (
+  const renderClinicFormFields = (isCreate = false) => (
     <div className={styles.form}>
       {formErrors.form && <div className="alert alert-danger">{formErrors.form}</div>}
+      {!isCreate && (
+        <div className={styles.ratingInfo}>
+          <div className={styles.ratingInfoItem}>
+            <i className="bi bi-star-fill" />
+            <span>{formatRating(selectedClinic?.avgRating)} avg rating</span>
+          </div>
+          <div className={styles.ratingInfoItem}>
+            <i className="bi bi-chat-left-text" />
+            <span>{selectedClinic?.reviewsCount ?? 0} reviews</span>
+          </div>
+        </div>
+      )}
       <div className={styles.formRow}>
         <Input
           label="Clinic Name"
@@ -484,12 +506,38 @@ const Clinics = () => {
           rows={2}
         />
       </div>
+
+      <label className={styles.checkboxLabel}>
+        <input
+          type="checkbox"
+          name="reviewsEnabled"
+          checked={formData.reviewsEnabled}
+          onChange={handleInputChange}
+        />
+        <span>Reviews enabled</span>
+      </label>
+      <p className={styles.reviewsHint}>
+        Branches also need their own reviews toggle on — both the clinic and the branch must
+        have reviews enabled for a user to submit one.
+      </p>
     </div>
   );
 
-  const renderBranchFormFields = () => (
+  const renderBranchFormFields = (isCreate = false) => (
     <div className={styles.form}>
       {branchFormErrors.form && <div className="alert alert-danger">{branchFormErrors.form}</div>}
+      {!isCreate && (
+        <div className={styles.ratingInfo}>
+          <div className={styles.ratingInfoItem}>
+            <i className="bi bi-star-fill" />
+            <span>{formatRating(selectedBranch?.avgRating)} avg rating</span>
+          </div>
+          <div className={styles.ratingInfoItem}>
+            <i className="bi bi-chat-left-text" />
+            <span>{selectedBranch?.reviewsCount ?? 0} reviews</span>
+          </div>
+        </div>
+      )}
       <Input
         label="Branch Name"
         name="title"
@@ -575,22 +623,44 @@ const Clinics = () => {
         />
         <span>Main branch</span>
       </label>
+
+      <label className={styles.checkboxLabel}>
+        <input
+          type="checkbox"
+          name="reviewsEnabled"
+          checked={branchFormData.reviewsEnabled}
+          onChange={handleBranchInputChange}
+        />
+        <span>Reviews enabled</span>
+      </label>
+      {selectedClinic && !selectedClinic.reviewsEnabled ? (
+        <div className={styles.statusNote}>
+          <i className="bi bi-exclamation-triangle" />
+          Reviews are currently disabled at the clinic level ({selectedClinic.title}) — turning
+          this on alone won't let users submit reviews for this branch until the clinic-level
+          toggle is enabled too.
+        </div>
+      ) : (
+        <p className={styles.reviewsHint}>
+          Both the clinic and this branch must have reviews enabled for a user to submit one.
+        </p>
+      )}
     </div>
   );
 
   // ── Table columns ─────────────────────────────────────────────────────────
   const columns = [
-    { key: 'title', label: 'Name', width: '22%' },
+    { key: 'title', label: 'Name', width: '20%' },
     {
       key: 'email',
       label: 'Email',
-      width: '22%',
+      width: '18%',
       render: (row) => row.email || <span style={{ color: '#ADB5BD' }}>--</span>,
     },
     {
       key: 'website',
       label: 'Website',
-      width: '18%',
+      width: '14%',
       render: (row) =>
         row.website ? (
           <a
@@ -608,7 +678,7 @@ const Clinics = () => {
     {
       key: 'status',
       label: 'Status',
-      width: '13%',
+      width: '12%',
       render: (row) => {
         const status = getStatus(row);
         const cfg = STATUS_CONFIG[status] || { label: status, className: styles.statusPending };
@@ -616,9 +686,22 @@ const Clinics = () => {
       },
     },
     {
+      key: 'reviews',
+      label: 'Reviews',
+      width: '14%',
+      render: (row) => (
+        <div className={styles.reviewsColumnCell}>
+          <span className={styles.reviewsColumnRating}>
+            <i className="bi bi-star-fill"></i> {formatRating(row.avgRating)} ({row.reviewsCount ?? 0})
+          </span>
+          {!row.reviewsEnabled && <span className={styles.reviewsOffBadge}>Off</span>}
+        </div>
+      ),
+    },
+    {
       key: 'createdAt',
       label: 'Created',
-      width: '10%',
+      width: '9%',
       render: (row) => new Date(row.createdAt).toLocaleDateString(),
     },
     {
@@ -725,7 +808,7 @@ const Clinics = () => {
           <Button variant="outline" onClick={() => setIsCreateModalOpen(false)} disabled={submitLoading}>Cancel</Button>
           <Button variant="primary" onClick={handleCreateSubmit} loading={submitLoading}>Add Clinic</Button>
         </>}>
-        {renderClinicFormFields()}
+        {renderClinicFormFields(true)}
       </Modal>
 
       {/* ── Edit Clinic Modal ── */}
@@ -734,7 +817,7 @@ const Clinics = () => {
           <Button variant="outline" onClick={() => setIsEditModalOpen(false)} disabled={submitLoading}>Cancel</Button>
           <Button variant="primary" onClick={handleEditSubmit} loading={submitLoading}>Save Changes</Button>
         </>}>
-        {renderClinicFormFields()}
+        {renderClinicFormFields(false)}
       </Modal>
 
       {/* ── Delete Clinic Modal ── */}
@@ -810,6 +893,11 @@ const Clinics = () => {
                       <i className="bi bi-building"></i>
                       {branch.title}
                       {branch.isMainBranch && <span className={styles.mainBranchBadge}>Main</span>}
+                      {!branch.reviewsEnabled && <span className={styles.reviewsOffBadge}>Reviews off</span>}
+                    </div>
+                    <div className={styles.branchDetail}>
+                      <i className="bi bi-star-fill"></i>
+                      {formatRating(branch.avgRating)} ({branch.reviewsCount ?? 0} reviews)
                     </div>
                     {branch.address && (
                       <div className={styles.branchDetail}><i className="bi bi-geo-alt"></i>{branch.address}</div>
@@ -849,7 +937,7 @@ const Clinics = () => {
           <Button variant="outline" onClick={() => setIsAddBranchModalOpen(false)} disabled={branchSubmitLoading}>Cancel</Button>
           <Button variant="primary" onClick={handleAddBranchSubmit} loading={branchSubmitLoading}>Add Branch</Button>
         </>}>
-        {renderBranchFormFields()}
+        {renderBranchFormFields(true)}
       </Modal>
 
       {/* ── Edit Branch Modal ── */}
@@ -858,7 +946,7 @@ const Clinics = () => {
           <Button variant="outline" onClick={() => setIsEditBranchModalOpen(false)} disabled={branchSubmitLoading}>Cancel</Button>
           <Button variant="primary" onClick={handleEditBranchSubmit} loading={branchSubmitLoading}>Save Changes</Button>
         </>}>
-        {renderBranchFormFields()}
+        {renderBranchFormFields(false)}
       </Modal>
 
       {/* ── Delete Branch Modal ── */}
