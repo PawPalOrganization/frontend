@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import adminAdminsService from '../../services/adminAdminsService';
+import { useAdminAuth } from '../../context/useAdminAuth';
 import DataTable from '../../components/common/DataTable/DataTable';
 import Button from '../../components/common/Button/Button';
 import Modal from '../../components/common/Modal/Modal';
@@ -8,6 +9,7 @@ import TablePageSkeleton from '../../components/common/Skeleton/TablePageSkeleto
 import styles from './Admins.module.scss';
 
 const Admins = () => {
+  const { admin: currentAdmin } = useAdminAuth();
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,6 +32,16 @@ const Admins = () => {
   const [formErrors, setFormErrors] = useState({});
   const [submitLoading, setSubmitLoading] = useState(false);
   const searchTimerRef = useRef(null);
+
+  // Backend now 403s if an admin tries to set another admin's password (name/email
+  // stay editable by anyone) — mirror that here so the password field is only ever
+  // offered when editing your own account. Falls back to comparing email in case the
+  // stored admin object doesn't carry an id in the exact same shape as the list rows.
+  const isEditingSelf =
+    !!currentAdmin &&
+    !!selectedAdmin &&
+    (currentAdmin.id === selectedAdmin.id ||
+      (!!currentAdmin.email && currentAdmin.email === selectedAdmin.email));
 
   // Fetch admins
   const fetchAdmins = async (page = 1, search = '') => {
@@ -153,8 +165,10 @@ const Admins = () => {
     setSubmitLoading(true);
     try {
       const updateData = { ...formData };
-      // Remove password if empty (don't update password)
-      if (!updateData.password) {
+      // Remove password if empty (don't update password), or if this isn't your own
+      // account (the field is hidden in that case, but strip it here too rather than
+      // trust that the UI state can't drift — the backend rejects it either way).
+      if (!updateData.password || !isEditingSelf) {
         delete updateData.password;
       }
 
@@ -162,9 +176,12 @@ const Admins = () => {
       setIsEditModalOpen(false);
       fetchAdmins(currentPage, searchTerm);
     } catch (error) {
-      setFormErrors({
-        form: error.response?.data?.message || 'Failed to update admin',
-      });
+      const message = error.response?.data?.message || 'Failed to update admin';
+      setFormErrors(
+        typeof message === 'string' && /password/i.test(message)
+          ? { password: message }
+          : { form: message },
+      );
     } finally {
       setSubmitLoading(false);
     }
@@ -374,16 +391,22 @@ const Admins = () => {
             required
           />
 
-          <Input
-            label="Password"
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
-            error={formErrors.password}
-            placeholder="Leave empty to keep current password"
-            icon="bi-lock"
-          />
+          {isEditingSelf ? (
+            <Input
+              label="Password"
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              error={formErrors.password}
+              placeholder="Leave empty to keep current password"
+              icon="bi-lock"
+            />
+          ) : (
+            <p className={styles.selfOnlyNotice}>
+              <i className="bi bi-shield-lock"></i> Only this admin can change their own password.
+            </p>
+          )}
         </div>
       </Modal>
 

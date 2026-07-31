@@ -7,9 +7,11 @@ import PawLoader from './components/common/PawLoader/PawLoader';
 
 // Static imports — needed immediately, before any route-based code splitting matters
 import Login from './pages/Login/Login';
-import Dashboard from './pages/Admin/Dashboard';
 
 // Lazy page chunks — each becomes its own JS file, loaded only when navigated to
+// Dashboard now pulls in recharts (clinic approval pie chart), so it moved out of the
+// static-import group above — otherwise every page would ship that weight upfront.
+const Dashboard = lazy(() => import('./pages/Admin/Dashboard'));
 const Users = lazy(() => import('./pages/Admin/Users'));
 const Pets = lazy(() => import('./pages/Admin/Pets'));
 const PetTypes = lazy(() => import('./pages/Admin/PetTypes'));

@@ -8,15 +8,27 @@ import Input from '../../components/common/Input/Input';
 import TablePageSkeleton from '../../components/common/Skeleton/TablePageSkeleton';
 import styles from './Users.module.scss';
 
-// Accepts a plain local number (exactly 11 digits, e.g. 01012345678) or an
-// international number with a country code (e.g. +201012345678).
+// Egyptian mobile number: 01[0125]XXXXXXXX (11 digits) locally, or the same
+// number with a +20/0020 country-code prefix instead of the leading 0. The
+// backend now validates/normalizes to this canonical format on create+update,
+// so this mirrors that rather than accepting any 11-digit string.
 const isValidPhoneNumber = (value) => {
   const trimmed = value.trim();
-  if (trimmed.startsWith('+')) {
-    return /^\+\d{10,15}$/.test(trimmed);
-  }
-  return /^\d{11}$/.test(trimmed);
+  if (trimmed.startsWith('+20')) return /^\+201[0125]\d{8}$/.test(trimmed);
+  if (trimmed.startsWith('0020')) return /^00201[0125]\d{8}$/.test(trimmed);
+  return /^01[0125]\d{8}$/.test(trimmed);
 };
+
+// Maps a backend error to the phone field specifically when it's clearly about the
+// phone number (e.g. the new Egyptian-format validation), rather than only ever
+// showing a generic top-of-form banner.
+function buildSubmitErrors(error, fallbackMessage) {
+  const message = error.response?.data?.message || fallbackMessage;
+  if (typeof message === 'string' && /phone/i.test(message)) {
+    return { phoneNumber: message };
+  }
+  return { form: message };
+}
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -178,7 +190,7 @@ const Users = () => {
     if (!formData.phoneNumber.trim()) {
       errors.phoneNumber = 'Phone number is required';
     } else if (!isValidPhoneNumber(formData.phoneNumber)) {
-      errors.phoneNumber = 'Enter an 11-digit phone number, or include a country code (e.g. +20xxxxxxxxxx)';
+      errors.phoneNumber = 'Enter a valid Egyptian mobile number, e.g. 01012345678 or +201012345678';
     }
 
     if (!formData.birthDate) {
@@ -216,9 +228,7 @@ const Users = () => {
       setIsCreateModalOpen(false);
       fetchUsers(currentPage, searchTerm);
     } catch (error) {
-      setFormErrors({
-        form: error.response?.data?.message || 'Failed to create user',
-      });
+      setFormErrors(buildSubmitErrors(error, 'Failed to create user'));
     } finally {
       setSubmitLoading(false);
     }
@@ -245,9 +255,7 @@ const Users = () => {
       setIsEditModalOpen(false);
       fetchUsers(currentPage, searchTerm);
     } catch (error) {
-      setFormErrors({
-        form: error.response?.data?.message || 'Failed to update user',
-      });
+      setFormErrors(buildSubmitErrors(error, 'Failed to update user'));
     } finally {
       setSubmitLoading(false);
     }

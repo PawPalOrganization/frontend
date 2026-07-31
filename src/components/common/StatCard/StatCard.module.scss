@@ -1,0 +1,71 @@
+.statCard {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  min-width: 0;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.statIcon {
+  width: 60px;
+  height: 60px;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #0d9aff, #0b7fd9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  i {
+    font-size: 1.75rem;
+    color: white;
+  }
+}
+
+.statContent {
+  flex: 1;
+  min-width: 0;
+
+  h3 {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin: 0 0 0.5rem 0;
+    font-weight: 500;
+  }
+}
+
+.statNumber {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.trend {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.trendUp {
+  color: #27ae60;
+}
+
+.trendDown {
+  color: #e74c3c;
+}
+
+.trendNeutral {
+  color: #7f8c8d;
+}

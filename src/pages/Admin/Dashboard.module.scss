@@ -15,61 +15,168 @@
   margin-bottom: 2rem;
 }
 
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 2rem 0 1rem;
+
+  &:first-of-type {
+    margin-top: 1rem;
+  }
+}
+
 // Stats Grid
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+// ── Widgets row (chart / recent reviews / system health) ──────────────────────
+.widgetsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
   margin-top: 2rem;
 }
 
-.statCard {
+.widgetCard {
   background: white;
   border-radius: 1rem;
   padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.widgetHeader {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.widgetTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 1rem;
+}
+
+.widgetHeader .widgetTitle {
+  margin-bottom: 0;
+}
+
+.widgetLink {
+  background: none;
+  border: none;
+  color: #0d9aff;
+  font-size: 0.82rem;
+  font-weight: 600;
   cursor: pointer;
+  padding: 0;
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    text-decoration: underline;
   }
 }
 
-.statIcon {
-  width: 60px;
-  height: 60px;
-  border-radius: 0.75rem;
-  background: linear-gradient(135deg, #0d9aff, #0b7fd9);
+.widgetLoading {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  min-height: 180px;
+}
+
+.widgetEmpty {
+  color: #adb5bd;
+  font-size: 0.875rem;
+  text-align: center;
+  padding: 2rem 0;
+  margin: 0;
+}
+
+// ── Recent reviews list ─────────────────────────────────────────────────────
+.reviewList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.reviewItem {
+  padding-bottom: 0.875rem;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.reviewStars {
+  color: #f39c12;
+  font-size: 0.8rem;
+  margin-bottom: 0.25rem;
 
   i {
-    font-size: 1.75rem;
-    color: white;
+    margin-right: 1px;
   }
 }
 
-.statContent {
-  flex: 1;
-
-  h3 {
-    font-size: 0.875rem;
-    color: #6c757d;
-    margin: 0 0 0.5rem 0;
-    font-weight: 500;
-  }
-}
-
-.statNumber {
-  font-size: 2rem;
-  font-weight: 700;
+.reviewMeta {
+  margin: 0 0 0.25rem;
+  font-size: 0.85rem;
   color: #2c3e50;
+
+  strong {
+    font-weight: 600;
+  }
+}
+
+.reviewComment {
   margin: 0;
+  font-size: 0.8rem;
+  color: #7f8c8d;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+// ── System health panel ─────────────────────────────────────────────────────
+.healthRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.875rem;
+  color: #495057;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.healthBadgeOn {
+  color: #27ae60;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.healthBadgeOff {
+  color: #e74c3c;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.healthBadgeUnknown {
+  color: #adb5bd;
+  font-size: 0.8rem;
+  font-weight: 600;
 }

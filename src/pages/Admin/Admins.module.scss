@@ -109,3 +109,21 @@
   color: #495057;
   margin-bottom: 8px;
 }
+
+.selfOnlyNotice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 16px;
+  border: 1px solid #DEE2E6;
+  border-radius: 8px;
+  background: #F8F9FA;
+  color: #7F8C8D;
+  font-size: 13px;
+
+  i {
+    color: #0D9AFF;
+    font-size: 15px;
+  }
+}
