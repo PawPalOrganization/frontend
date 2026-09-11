@@ -24,6 +24,8 @@ const Clinics = lazy(() => import('./pages/Admin/Clinics'));
 const ClinicServices = lazy(() => import('./pages/Admin/ClinicServices'));
 const ClinicStaff = lazy(() => import('./pages/Admin/ClinicStaff'));
 const ClinicStaffRoles = lazy(() => import('./pages/Admin/ClinicStaffRoles'));
+const VaccinationTypes = lazy(() => import('./pages/Admin/VaccinationTypes'));
+const CancellationReasons = lazy(() => import('./pages/Admin/CancellationReasons'));
 const Reviews = lazy(() => import('./pages/Admin/Reviews'));
 const DataShareTester = lazy(() => import('./pages/Admin/DataShareTester'));
 const ReviewTester = lazy(() => import('./pages/Admin/ReviewTester'));
@@ -71,6 +73,8 @@ function App() {
               <Route path="clinic-services" element={<ClinicServices />} />
               <Route path="clinic-staff" element={<ClinicStaff />} />
               <Route path="clinic-staff-roles" element={<ClinicStaffRoles />} />
+              <Route path="vaccination-types" element={<VaccinationTypes />} />
+              <Route path="cancellation-reasons" element={<CancellationReasons />} />
               <Route path="reviews" element={<Reviews />} />
               <Route path="data-share-tester" element={<DataShareTester />} />
               <Route path="review-tester" element={<ReviewTester />} />
